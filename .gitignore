@@ -1,3 +1,20 @@
-# Godot 4+ specific ignores
 .godot/
+*.import
+bin/
+obj/
+publish/
+tmp/
+*.pck
+*.dll
+*.deps.json
+*.runtimeconfig.json
+.idea/
+.vs/
+*.suo
+*.user
+*.userprefs
+*.DotSettings.user
+packages/
 /android/
+*cs.uid
+.git/
