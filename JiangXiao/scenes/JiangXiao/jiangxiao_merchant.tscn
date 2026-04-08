@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c1gxvxmv5rylv"]
+
+[ext_resource type="Script" uid="uid://baekjnqlgd3nu" path="res://Code/Nodes/SNMerchantCharacter.cs" id="1_b7tdn"]
+
+[node name="JiangXiaoMerchant" type="Node2D"]
+script = ExtResource("1_b7tdn")

@@ -1,0 +1,21 @@
+{
+  "JIANGXIAOMOD-RUINANCE_POWER.title": "忍耐",
+  "JIANGXIAOMOD-RUINANCE_POWER.description": "受到的攻擊傷害減少 [gold]{resist:diff()}[/gold] 點。",
+  "JIANGXIAOMOD-RUINANCE_POWER.smartDescription": "受到的攻擊傷害減少 [gold]{resist:diff()}[/gold] 點。",
+
+  "JIANGXIAOMOD-BEAT_BACK_POWER.title": "擊退",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.description": "在回合結束時，獲得失去的 {Amount} 點 [gold]力量[/gold]",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.smartDescription": "在回合結束時，獲得失去的 {Amount} 點 [gold]力量[/gold]",
+
+  "JIANGXIAOMOD-CHENG_YIN_POWER.title": "承印",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.description": "指引鐘鈴的醫療光線。\n 在受傷時獲得 [gold] {RegenAmt:diff()} [/gold]點再生。",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.smartDescription": "指引鐘鈴的醫療光線。\n 在受傷時獲得 [gold] {RegenAmt:diff()} [/gold]點再生。",
+
+  "JIANGXIAOMOD-DAWN_POWER.smartDescription": "每回合額外抽 [gold]{M}[/gold] 張牌，眷戀總是追逐著一絲絲曙光。",
+  "JIANGXIAOMOD-DAWN_POWER.description": "每回合額外抽 [gold]{M}[/gold] 張牌，眷戀總是追逐著一絲絲曙光。",
+  "JIANGXIAOMOD-DAWN_POWER.title": "曙光",
+
+  "JIANGXIAOMOD-YEARNING_HALO_POWER.description": "每一次進攻附帶 [gold]{M}%[/gold] 吸血。",
+  "JIANGXIAOMOD-YEARNING_HALO_POWER.smartDescription": "每一次進攻附帶 [gold]{M}%[/gold] 吸血。",
+  "JIANGXIAOMOD-YEARNING_HALO_POWER.title": "眷戀光環"
+}

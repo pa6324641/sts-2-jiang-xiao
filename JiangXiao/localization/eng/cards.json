@@ -1,0 +1,46 @@
+{
+	"JIANGXIAOMOD-RUINANCE.title": "忍耐",
+	"JIANGXIAOMOD-RUINANCE.description": "[blue]星技[/blue] 。\n [blue]被動星技[/blue]。 \n 獲得 [gold]{Block:diff()}[/gold] 點[gold]格擋[/gold]。 \n 獲得 [gold]忍耐[/gold] 能力。",
+
+	"JIANGXIAOMOD-QING_MANG.title": "青芒",
+	"JIANGXIAOMOD-QING_MANG.description": "[blue]星技[/blue] \n [blue]打擊[/blue]。 \n 造成 [gold]{Damage:diff()}[/gold] 點傷害(隨品質提升)。 \n 減少目標 [gold]{M}[/gold] 點[gold]力量[/gold](隨品質提升)。 \n 持有近戰被動時傷害 *2； \n 目標擁有【人工製品】時傷害 *5。",
+
+	"JIANGXIAOMOD-QING_MANG7.title": "青芒",
+	"JIANGXIAOMOD-QING_MANG7.description": "[blue]打擊[/blue]。\n [blue]星技[/blue]  \n 造成 [gold]{Damage:diff()}[/gold] 點傷害(隨品質提升)。 \n 減少目標 [blue]{M:diff()}[/blue] 點[gold]力量[/gold](隨品質提升)。 \n 持有近戰被動時傷害 *2； \n 目標擁有【人工製品】時傷害 *5。",
+	"JIANGXIAOMOD-RUINANCE2.title": "忍耐",
+	"JIANGXIAOMOD-RUINANCE2.description": "[blue]被動[/blue]。\n [blue]星技[/blue]  \n 獲得 [gold]{Block:diff()}[/gold] 點[gold]格擋[/gold]。 \n 獲得 [gold]{M}[/gold] 層 [blue]忍耐[/blue] 能力。",
+
+	"JIANGXIAOMOD-STRIKE_JIANG_XIAO.title": "打擊",
+    "JIANGXIAOMOD-STRIKE_JIANG_XIAO.description": "[blue]星技[/blue]。 \n 造成 {Damage:diff()} 點傷害。\n (受 [gold]星技品質[/gold] 強化)",
+
+    "JIANGXIAOMOD-DEFEND_JIANG_XIAO.title": "防禦",
+    "JIANGXIAOMOD-DEFEND_JIANG_XIAO.description": "[blue]星技[/blue]。 \n 獲得 {Block:diff()} [gold]格擋[/gold]。\n (受 [gold]星技品質[/gold] 強化)",
+
+	"JIANGXIAOMOD-BLESSING.title": "祝福",
+    "JIANGXIAOMOD-BLESSING.description": "[blue]星技[/blue]。 \n 治癒一名隊友[gold] {HealAmount:diff()} [/gold]點生命 。",
+
+	"JIANGXIAOMOD-CHENG_YIN.description": "[blue]星技[/blue]。 \n 為友方施加 [gold] 承印 [/gold] 。\n 受傷時獲得持續治癒，指引鐘鈴的醫療光線。",
+  	"JIANGXIAOMOD-CHENG_YIN.title": "承印",
+
+	"JIANGXIAOMOD-ZHONG_LING.description": "[blue]星技[/blue]。 \n 施放醫療光線治癒隨機目標 {Magic:diff()} 次，每次恢復 {Heal:diff()} 點生命，優先治癒 [gold]承印[/gold] 能力的友方。",
+ 	"JIANGXIAOMOD-ZHONG_LING.title": "鐘鈴",
+
+	"JIANGXIAOMOD-DAWN.description": "[blue]星技[/blue]。 \n 為友方施加： \n {Block:diff()} [gold]格擋[/gold]。\n [gold] 曙光 [/gold]。",
+	"JIANGXIAOMOD-DAWN.title": "曙光",
+
+	"JIANGXIAOMOD-YEARNING.description": "[blue]星技[/blue]。 \n 為所有擁有 [gold]曙光[/gold] 的隊友施加 [gold]眷戀光環[/gold]。\n 若無，則對所有單位施加。\n 目前提供 [gold]{M}%[/gold] 吸血效果",
+	"JIANGXIAOMOD-YEARNING.title": "眷戀光環",
+
+	"MYCUSTOMMOD-UNIVERSAL_HEAL_CARD.title": "萬能治療",
+  	"MYCUSTOMMOD-UNIVERSAL_HEAL_CARD.description": "選擇一名任意生物，恢復 8 點生命。",
+
+	"JIANGXIAOMOD-RETROGRADE_LIGHT.title": "逆流之光",
+	"JIANGXIAOMOD-RETROGRADE_LIGHT.description": "選擇：將血量與 [gold]敵方[/gold] 或 [gold]友方[/gold] 均分。",
+	"JIANGXIAOMOD-RETROGRADE_LIGHT_ENEMY.title": "逆流之光:敵方",
+	"JIANGXIAOMOD-RETROGRADE_LIGHT_ENEMY.description": "消耗。選擇一個敵人，將自身與其血量均分。",
+	"JIANGXIAOMOD-RETROGRADE_LIGHT_ALLY.title": "逆流之光:友方",
+	"JIANGXIAOMOD-RETROGRADE_LIGHT_ALLY.description": "消耗。選擇一個友方，將自身與其血量均分。",
+
+	"JIANGXIAOMOD-RESENTMENT.description": "",
+  	"JIANGXIAOMOD-RESENTMENT.title": "Resentment"	
+}

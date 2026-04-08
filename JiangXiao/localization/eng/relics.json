@@ -1,0 +1,11 @@
+{
+  "JIANGXIAOMOD-INNER_STAR_MAP.title": "Inner Star Map",
+  "JIANGXIAOMOD-INNER_STAR_MAP.description": "Jiang Xiao Exclusive. Core Relic.\nGain Skill Points upon victory (Normal/Event +1250, Elite +2500, Boss +5000).\nCurrently possess [gold]{points:diff()}[/gold] Skill Points.\n(Upon obtaining this relic, automatically acquire the Star Map, Star Technique Quality, and Star Power Level relics.)",
+  "JIANGXIAOMOD-INNER_STAR_MAP.flavor": "A mystical Star Map residing within the mind—the very origin of Jiang Xiao's journey as the Toxic Healer.",
+  "JIANGXIAOMOD-STAR_POWER_LEVEL.title": "Star Power",
+  "JIANGXIAOMOD-STAR_POWER_LEVEL.description": "Current Star Power Level: [gold]{level:choose(1|2|3|4|5|6):Stardust Stage|Nebula Stage|Star River Stage|Star Sea Stage|Starry Sky Stage|Star's End Stage}[/gold].\nAt the start of each turn, gain [gold]{energy}[/gold] Energy.",
+  "JIANGXIAOMOD-STAR_POWER_LEVEL.flavor": "Star power surges like the tides; the lighting of every single star signifies a qualitative leap forward.",
+  "JIANGXIAOMOD-STAR_SKILL_QUALITY.title": "Star Skill Quality",
+  "JIANGXIAOMOD-STAR_SKILL_QUALITY.description": "Current Quality: [gold]{rank:choose(1|2|3|4|5|6|7):Bronze|Silver|Gold|Platinum|Diamond|Candle Moon|Scorching Sun}[/gold].\nCard effects increased by {multiplier}%.",
+  "JIANGXIAOMOD-STAR_SKILL_QUALITY.flavor": "Quality dictates the purity of Star Power. From Bronze to Scorching Sun, it is the yawning chasm that separates mortals from gods."
+}

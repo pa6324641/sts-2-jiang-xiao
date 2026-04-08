@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://cktcswis8yi1v"]
+
+[ext_resource type="Texture2D" uid="uid://f3bt1vuv754p" path="res://JiangXiao/images/JiangXiao/JiangXiaoPortrait2.png" id="1_85n6c"]
+
+[node name="JiangXiaoBG" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 2760.0
+offset_bottom = 1511.0
+texture = ExtResource("1_85n6c")
