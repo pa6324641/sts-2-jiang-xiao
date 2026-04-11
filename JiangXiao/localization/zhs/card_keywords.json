@@ -6,6 +6,9 @@
   "JIANGXIAOMOD-RUINANCEPOWER.description": "受到的攻擊傷害減少。",
 
   "JIANGXIAOMOD-PASSIVE.title": "被動星技",
-  "JIANGXIAOMOD-PASSIVE.description": "無須主動開啟。"
+  "JIANGXIAOMOD-PASSIVE.description": "無須主動開啟。",
+
+  "JIANGXIAOMOD-JIANGXIAOMODUNARMED.title": "徒手格鬥",
+  "JIANGXIAOMOD-JIANGXIAOMODUNARMED.description": "代表徒手戰鬥的技巧。每打出一張此類卡片，會增加徒手格鬥點數。"
 
 }

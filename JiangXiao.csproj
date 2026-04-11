@@ -76,33 +76,36 @@
             <Private>false</Private>
         </Reference>
 
-        <PackageReference Include="Alchyr.Sts2.BaseLib" Version="0.1.9" PrivateAssets="All" />
+        <PackageReference Include="Alchyr.Sts2.BaseLib" Version="3.0.1" PrivateAssets="All" />
         <PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="0.0.9"/>
         <AdditionalFiles Include="JiangXiao/localization/**/*.json"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Compile Remove="JiangXiao/**"/>
+    <!--<ItemGroup>
+		<Compile Remove="JiangXiao/**"/>
         <Compile Remove="shaders/**"/>
         <EmbeddedResource Remove="JiangXiao/**"/>
         <EmbeddedResource Remove="shaders/**"/>
-    </ItemGroup>
+    </ItemGroup> -->
 
     <ItemGroup>
         <None Include=".gitignore"/>
         <None Include="JiangXiao.json"/>
         <None Include="project.godot"/>
         <None Include="JiangXiao/**"/>
+		<None Include="**/*.tscn" />
+		<None Include="**/*.tres" />
     </ItemGroup>
 
-    <!-- <ItemGroup> -->
-        <!-- <Folder Include="JiangXiao\materials\transitions\"/> -->
-    <!-- </ItemGroup> -->
+    <!--<<ItemGroup>
+        <<Folder Include="JiangXiao\materials\transitions\"/>
+    <</ItemGroup>-->
 
-    <!-- <ItemGroup> -->
-        <!-- <Content Include="images\ui\top_panel\character_icon_watcher-watcher_outline.png"/> -->
-        <!-- <Content Include="images\ui\top_panel\character_icon_watcher-watcher_outline.png.import"/> -->
-    <!-- </ItemGroup> -->
+    <ItemGroup>
+        <!--<Content Include="images\ui\top_panel\character_icon_JiangXiao2_outline.png"/>-->
+        <Content Include="images\ui\top_panel\character_icon_JiangXiao2.png"/>
+        <Content Include="images\ui\top_panel\character_icon_JiangXiao2.png.import"/>
+    </ItemGroup>
 
 
 	<Target Name="CopyToModsFolderOnBuild" AfterTargets="PostBuildEvent">
@@ -110,11 +113,11 @@
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/"/>
         <Copy SourceFiles="JiangXiao.json" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/"/>
         
-        <Message Text="正在複製 BaseLib 0.1.9 到 mods 文件夾..." Importance="high"/>
+        <Message Text="正在複製 BaseLib 3.0.1 到 mods 文件夾..." Importance="high"/>
         <ItemGroup>
-            <BaseLibFiles Include="$(NuGetPackageRoot)alchyr.sts2.baselib/0.1.9/lib/net9.0/BaseLib.dll;
-                                 $(NuGetPackageRoot)alchyr.sts2.baselib/0.1.9/Content/BaseLib.pck;
-                                 $(NuGetPackageRoot)alchyr.sts2.baselib/0.1.9/Content/BaseLib.json;"/>
+            <BaseLibFiles Include="$(NuGetPackageRoot)alchyr.sts2.baselib/3.0.1/lib/net9.0/BaseLib.dll;
+                                 $(NuGetPackageRoot)alchyr.sts2.baselib/3.0.1/Content/BaseLib.pck;
+                                 $(NuGetPackageRoot)alchyr.sts2.baselib/3.0.1/Content/BaseLib.json;"/>
         </ItemGroup>
         <Copy SourceFiles="@(BaseLibFiles)" DestinationFolder="$(ModsPath)BaseLib/"/>
     </Target>

@@ -53,6 +53,14 @@
 	"JIANGXIAOMOD-REST_TOKEN.title": "休息",
 
 	"JIANGXIAOMOD-SECONDARY_FACE.title": "副相",
-	"JIANGXIAOMOD-SECONDARY_FACE.description": "選擇手牌中 1 張牌，將 [gold]{M}[/gold] 張複本加入手牌。複本耗能變為 0 並具有 [gold]消耗[/gold] 。"
-  	
+	"JIANGXIAOMOD-SECONDARY_FACE.description": "選擇手牌中 1 張牌，將 [gold]{M}[/gold] 張複本加入手牌。複本耗能變為 0 並具有 [gold]消耗[/gold] 。",
+
+	"JIANGXIAOMOD-TEAR_OF_SORROW.title": "傷淚",
+  	"JIANGXIAOMOD-TEAR_OF_SORROW.description": "[blue]星技[/blue]。\n給予所有單位 [gold]{M}[/gold] 層 [gold]悲傷之淚[/gold]。\n(星技品質為 [red]白銀[/red] 以上時，改為僅給予全體敵人)",
+
+	"JIANGXIAOMOD-CLEAN_TEARS.title": "淨淚",
+	"JIANGXIAOMOD-CLEAN_TEARS.description": "[blue]星技[/blue]。\n清除自身和隊友的 [blue]狀態[/blue]&[blue]詛咒[/blue] 牌，從抽牌堆/手牌/棄牌堆中各 [gold]{M:diff()}[/gold] 張",
+
+	"JIANGXIAOMOD-UNARMED_STRIKE.title": "徒手打擊",
+  	"JIANGXIAOMOD-UNARMED_STRIKE.description": "[blue]徒手格鬥[/blue]。 \n 造成 {Damage:diff()} 點傷害，抽 [gold]{M}[/gold] 張牌。 \n (受 [gold]徒手格鬥等級[/gold] 強化)"
 }

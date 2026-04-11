@@ -4,10 +4,15 @@
   "JIANGXIAOMOD-INNER_STAR_MAP.flavor": "這是一個存在於腦海中的神奇星圖，是江曉毒奶之路的起點。",
 
   "JIANGXIAOMOD-STAR_POWER_LEVEL.title": "星力等級",
-  "JIANGXIAOMOD-STAR_POWER_LEVEL.description": "當前星力等級：[gold]{level:choose(1|2|3|4|5|6):星塵期|星雲期|星河期|星海期|星空期|星盡期}[/gold] 。\n每回合開始時，獲得[gold] {energy} [/gold]點 能量 。",
+  "JIANGXIAOMOD-STAR_POWER_LEVEL.description": "當前星力等級：[gold]{level:choose(1|2|3|4|5|6):星塵期|星雲期|星河期|星海期|星空期|星盡期}[/gold] 。\n額外獲得[gold] {energy} [/gold]點 能量 。",
   "JIANGXIAOMOD-STAR_POWER_LEVEL.flavor": "星力如潮汐般湧動，每一顆星辰的點亮都意味著質的飛躍。",
 
   "JIANGXIAOMOD-STAR_SKILL_QUALITY.title": "星技品質",
-  "JIANGXIAOMOD-STAR_SKILL_QUALITY.description": "當前品質：[gold]{rank:choose(1|2|3|4|5|6|7):青銅|白銀|黃金|白金|鑽石|燭月|焦陽}[/gold] 。\n卡牌效果提升 {multiplier}% 。",
-  "JIANGXIAOMOD-STAR_SKILL_QUALITY.flavor": "品質決定了星力的純度，從青銅到焦陽，是凡人與神祇的鴻溝。"
+  "JIANGXIAOMOD-STAR_SKILL_QUALITY.description": "當前品質：[gold]{rank:choose(1|2|3|4|5|6|7):青銅|白銀|黃金|白金|鑽石|燭月|焦陽}[/gold] 。",
+  "JIANGXIAOMOD-STAR_SKILL_QUALITY.flavor": "品質決定了星力的純度，從青銅到焦陽，是凡人與神祇的鴻溝。",
+
+  "JIANGXIAOMOD-BASIC_ARTS.title": "基礎技藝",
+  "JIANGXIAOMOD-BASIC_ARTS.description": "記錄你的戰鬥鍛鍊。打出對應類型的卡片時，該項點數 +1。每 [gold]10[/gold] 點提升 [gold]1[/gold] Rank。\\n\\n徒手格鬥：Rank [gold]{UnarmedR}[/gold] ({UnarmedP}/60)\\n夏家刀法：Rank [gold]{BladeR}[/gold] ({BladeP}/60)\\n弓箭精通：Rank [gold]{BowR}[/gold] ({BowP}/60)\\n匕首精通：Rank [gold]{DaggerR}[/gold] ({DaggerP}/60)\\n天方戟精通：Rank [gold]{HalberdR}[/gold] ({HalberdP}/60)\\n格鬥刀精通：Rank [gold]{CombatKnifeR}[/gold] ({CombatKnifeP}/60)",
+  "JIANGXIAOMOD-BASIC_ARTS.flavor": "每一次訓練 每一滴汗水，皆是登峰造極的基石"
+  
 }

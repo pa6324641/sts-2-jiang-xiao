@@ -21,5 +21,9 @@
 
   "JIANGXIAOMOD-RESENTMENT_POWER.title": "怨念",
   "JIANGXIAOMOD-RESENTMENT_POWER.smartDescription": "受到攻擊後，有 {MVar}% 的機率給予攻擊者隨機負面效果。",
-  "JIANGXIAOMOD-RESENTMENT_POWER.description": "受到攻擊後，有 {MVar}% 的機率給予攻擊者隨機負面效果。"
+  "JIANGXIAOMOD-RESENTMENT_POWER.description": "受到攻擊後，有 {MVar}% 的機率給予攻擊者隨機負面效果。",
+
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.title": "傷淚",
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.description": "在該單位回合開始時，每層使其損失 [gold]5%[/gold] 最大生命值 (當前每層損失：[gold]{M}[/gold] 點)。",
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.smartDescription": "在該單位回合開始時，每層使其損失 [gold]5%[/gold] 最大生命值 (當前每層損失：[gold]{M}[/gold] 點)。"
 }

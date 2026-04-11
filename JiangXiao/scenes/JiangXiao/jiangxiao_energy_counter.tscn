@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://b3hjnr86pqjkf"]
+
+[node name="JiangXiaoEnergyCounter" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="BurstBack" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+scale_amount_min = 0.2
+scale_amount_max = 0.2
+
+[node name="BurstFront" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+visible = false
