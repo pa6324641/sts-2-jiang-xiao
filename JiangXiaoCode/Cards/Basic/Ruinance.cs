@@ -33,7 +33,7 @@ public sealed class Ruinance() : CustomCardModel(
 
     // 這裡定義卡牌上顯示的數值
     protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new BlockVar(IsUpgraded ? 12m : 6m, ValueProp.Move),
+        new BlockVar(IsUpgraded ? 6m : 3m, ValueProp.Move),
         new DynamicVar("M", IsUpgraded ? 1m : 1m) ,
 
     ];
@@ -67,7 +67,7 @@ public sealed class Ruinance() : CustomCardModel(
     protected override void OnUpgrade()
     {
         // 升級時數值加強
-        DynamicVars.Block.UpgradeValueBy(6m);
+        DynamicVars.Block.UpgradeValueBy(3m);
     }
 
     public override async Task BeforeCombatStartLate()

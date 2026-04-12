@@ -81,5 +81,6 @@ public class UnarmedStrike : CustomCardModel
     {
         // 升級效果：基礎傷害再 +3 (可根據需求調整)
         DynamicVars.Damage.UpgradeValueBy(3m);
+        EnergyCost.UpgradeBy(-1);
     }
 }

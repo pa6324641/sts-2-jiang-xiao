@@ -47,7 +47,7 @@ public sealed class RuinancePower : CustomPowerModel
         var player = Owner?.Player ?? RunManager.Instance?.DebugOnlyGetState()?.Players.FirstOrDefault();
         // 調用你工具類中的邏輯
         int rankLevel = JiangXiaoUtils.GetSkillRank(player);
-        return 6 + (rankLevel - 1) * 6;
+        return 3 + (rankLevel - 1) * 3;
     }
 
     public override decimal ModifyDamageAdditive(Creature? target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)

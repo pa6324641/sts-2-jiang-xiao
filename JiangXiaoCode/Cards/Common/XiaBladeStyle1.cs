@@ -20,6 +20,7 @@ namespace JiangXiaoMod.Code.Cards.Common;
 /// 1費 攻擊 普通 
 /// 效果：獲得格擋並造成傷害，數值隨 BLADERank 提升。
 /// </summary>
+
 [Pool(typeof(JiangXiaoCardPool))]
 public class XiaBladeStyle1 : CustomCardModel
 {
@@ -35,8 +36,8 @@ public class XiaBladeStyle1 : CustomCardModel
     /// 定義卡片變量：Damage (傷害) 與 Block (格擋)
     /// </summary>
     protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new DamageVar(2m, ValueProp.Move), // 基礎傷害 2
-        new BlockVar(2m, ValueProp.Move)  // 基礎格擋 2
+        new DamageVar(1m, ValueProp.Move), // 基礎傷害 1
+        new BlockVar(1m, ValueProp.Move)  // 基礎格擋 1
     ];
 
     /// <summary>
@@ -57,9 +58,9 @@ public class XiaBladeStyle1 : CustomCardModel
         // [STS2_Optimization] 若手冊未定義 GetBladeRank，此處假設與 GetUnarmedRank 邏輯一致
         int rank = JiangXiaoUtils.GetBladeRank(Owner);
 
-        // [邏輯] 基礎 2 + 每級 2
-        // 計算結果：Rank 0 = 2, Rank 1 = 4, Rank 2 = 6...
-        decimal finalValue = 2m + (rank * 2m);
+        // [邏輯] 基礎 1 + 每級 1
+        // 計算結果：Rank 0 = 1, Rank 1 = 2, Rank 2 = 3...
+        decimal finalValue = 1m + (rank * 1m);
 
         DynamicVars.Damage.BaseValue = finalValue;
         DynamicVars.Block.BaseValue = finalValue;
@@ -92,7 +93,8 @@ public class XiaBladeStyle1 : CustomCardModel
     protected override void OnUpgrade()
     {
         // 升級建議：基礎值提升 (例如 2->5)，使成長基數更高
-        DynamicVars.Damage.UpgradeValueBy(3m);
-        DynamicVars.Block.UpgradeValueBy(3m);
+        DynamicVars.Damage.UpgradeValueBy(1m);
+        DynamicVars.Block.UpgradeValueBy(1m);
+        EnergyCost.UpgradeBy(-1);
     }
 }

@@ -19,6 +19,7 @@ using JiangXiaoMod.Code.Cards.Uncommon;
 using JiangXiaoMod.Code.Extensions;
 using MegaCrit.Sts2.Core.Nodes.Combat;
 
+
 namespace JiangXiaoMod.Code.Character;
 
 public class JiangXiao : PlaceholderCharacterModel
@@ -67,7 +68,7 @@ public class JiangXiao : PlaceholderCharacterModel
 		ModelDb.Card<DefendJiangXiao>(),
 		ModelDb.Card<DefendJiangXiao>(),
 		ModelDb.Card<DefendJiangXiao>(),
-		ModelDb.Card<UnarmedStrike>(),
+		ModelDb.Card<Blessing>(),
 		ModelDb.Card<Blessing>(),
 		ModelDb.Card<Blessing>(),
 		ModelDb.Card<Ruinance>()
