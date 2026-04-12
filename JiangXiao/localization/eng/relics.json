@@ -1,11 +1,17 @@
 {
   "JIANGXIAOMOD-INNER_STAR_MAP.title": "Inner Star Map",
-  "JIANGXIAOMOD-INNER_STAR_MAP.description": "Jiang Xiao Exclusive. Core Relic.\nGain Skill Points upon victory (Normal/Event +1250, Elite +2500, Boss +5000).\nCurrently possess [gold]{points:diff()}[/gold] Skill Points.\n(Upon obtaining this relic, automatically acquire the Star Map, Star Technique Quality, and Star Power Level relics.)",
-  "JIANGXIAOMOD-INNER_STAR_MAP.flavor": "A mystical Star Map residing within the mind—the very origin of Jiang Xiao's journey as the Toxic Healer.",
-  "JIANGXIAOMOD-STAR_POWER_LEVEL.title": "Star Power",
-  "JIANGXIAOMOD-STAR_POWER_LEVEL.description": "Current Star Power Level: [gold]{level:choose(1|2|3|4|5|6):Stardust Stage|Nebula Stage|Star River Stage|Star Sea Stage|Starry Sky Stage|Star's End Stage}[/gold].\nAt the start of each turn, gain [gold]{energy}[/gold] Energy.",
-  "JIANGXIAOMOD-STAR_POWER_LEVEL.flavor": "Star power surges like the tides; the lighting of every single star signifies a qualitative leap forward.",
+  "JIANGXIAOMOD-INNER_STAR_MAP.description": "Jiang Xiao Exclusive. Core Relic. \n Gain Skill Points upon winning a battle (Normal/Event +1250, Elite +2500, Boss +5000). \n Currently have [gold]{points:diff()}[/gold] Skill Points. \n (Upon obtaining this relic, automatically gain Star Map, Star Skill Quality, and Star Power Level relics.)",
+  "JIANGXIAOMOD-INNER_STAR_MAP.flavor": "A miraculous star map existing within the mind, the starting point of Jiang Xiao's path as a toxic healer.",
+
+  "JIANGXIAOMOD-STAR_POWER_LEVEL.title": "Star Power Level",
+  "JIANGXIAOMOD-STAR_POWER_LEVEL.description": "Current Star Power Level: [gold]{level:choose(1|2|3|4|5|6):Stardust|Nebula|Galaxy|Star Sea|Star Sky|Star End}[/gold]. \n Gain [gold]{energy}[/gold] additional Energy.",
+  "JIANGXIAOMOD-STAR_POWER_LEVEL.flavor": "Star power ebbs and flows like the tide; every star lit represents a qualitative leap.",
+
   "JIANGXIAOMOD-STAR_SKILL_QUALITY.title": "Star Skill Quality",
-  "JIANGXIAOMOD-STAR_SKILL_QUALITY.description": "Current Quality: [gold]{rank:choose(1|2|3|4|5|6|7):Bronze|Silver|Gold|Platinum|Diamond|Candle Moon|Scorching Sun}[/gold].\nCard effects increased by {multiplier}%.",
-  "JIANGXIAOMOD-STAR_SKILL_QUALITY.flavor": "Quality dictates the purity of Star Power. From Bronze to Scorching Sun, it is the yawning chasm that separates mortals from gods."
+  "JIANGXIAOMOD-STAR_SKILL_QUALITY.description": "Current Quality: [gold]{rank:choose(1|2|3|4|5|6|7):Bronze|Silver|Gold|Platinum|Diamond|Astral Moon|Solar}[/gold].",
+  "JIANGXIAOMOD-STAR_SKILL_QUALITY.flavor": "Quality determines the purity of star power. From Bronze to Solar, it is the chasm between mortals and gods.",
+
+  "JIANGXIAOMOD-BASIC_ARTS.title": "Basic Arts",
+  "JIANGXIAOMOD-BASIC_ARTS.description": "Records your combat training. When playing a card of the corresponding type, the points for that category +1. Every [gold]10[/gold] points increases the Rank by [gold]1[/gold].\\n\\nUnarmed Combat: Rank [gold]{UnarmedR}[/gold] ({UnarmedP}/60)\\nXia Style Blade: Rank [gold]{BladeR}[/gold] ({BladeP}/60)\\nArchery Mastery: Rank [gold]{BowR}[/gold] ({BowP}/60)\\nDagger Mastery: Rank [gold]{DaggerR}[/gold] ({DaggerP}/60)\\nHalberd Mastery: Rank [gold]{HalberdR}[/gold] ({HalberdP}/60)\\nCombat Knife Mastery: Rank [gold]{CombatKnifeR}[/gold] ({CombatKnifeP}/60)",
+  "JIANGXIAOMOD-BASIC_ARTS.flavor": "Every session of training and every drop of sweat is a foundation stone for reaching the pinnacle."
 }

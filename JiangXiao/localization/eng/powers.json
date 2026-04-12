@@ -1,21 +1,29 @@
 {
-  "JIANGXIAOMOD-RUINANCE_POWER.title": "忍耐",
-  "JIANGXIAOMOD-RUINANCE_POWER.description": "受到的攻擊傷害減少 [gold]{resist:diff()}[/gold] 點。",
-  "JIANGXIAOMOD-RUINANCE_POWER.smartDescription": "受到的攻擊傷害減少 [gold]{resist:diff()}[/gold] 點。",
+  "JIANGXIAOMOD-RUINANCE_POWER.title": "Endurance",
+  "JIANGXIAOMOD-RUINANCE_POWER.description": "Reduces attack damage taken by [gold]{resist:diff()}[/gold].",
+  "JIANGXIAOMOD-RUINANCE_POWER.smartDescription": "Reduces attack damage taken by [gold]{resist:diff()}[/gold].",
 
-  "JIANGXIAOMOD-BEAT_BACK_POWER.title": "擊退",
-  "JIANGXIAOMOD-BEAT_BACK_POWER.description": "在回合結束時，獲得失去的 {Amount} 點 [gold]力量[/gold]",
-  "JIANGXIAOMOD-BEAT_BACK_POWER.smartDescription": "在回合結束時，獲得失去的 {Amount} 點 [gold]力量[/gold]",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.title": "Beat Back",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.description": "At the end of your turn, gain {Amount} lost [gold]Strength[/gold].",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.smartDescription": "At the end of your turn, gain {Amount} lost [gold]Strength[/gold].",
 
-  "JIANGXIAOMOD-CHENG_YIN_POWER.title": "承印",
-  "JIANGXIAOMOD-CHENG_YIN_POWER.description": "指引鐘鈴的醫療光線。\n 在受傷時獲得 [gold] {RegenAmt:diff()} [/gold]點再生。",
-  "JIANGXIAOMOD-CHENG_YIN_POWER.smartDescription": "指引鐘鈴的醫療光線。\n 在受傷時獲得 [gold] {RegenAmt:diff()} [/gold]點再生。",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.title": "Seal Bearer",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.description": "The healing light that guides the bell.\n Whenever you take damage, gain [gold]{RegenAmt:diff()}[/gold] Regen.",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.smartDescription": "The healing light that guides the bell.\n Whenever you take damage, gain [gold]{RegenAmt:diff()}[/gold] Regen.",
 
-  "JIANGXIAOMOD-DAWN_POWER.smartDescription": "每回合額外抽 [gold]{M}[/gold] 張牌，眷戀總是追逐著一絲絲曙光。",
-  "JIANGXIAOMOD-DAWN_POWER.description": "每回合額外抽 [gold]{M}[/gold] 張牌，眷戀總是追逐著一絲絲曙光。",
-  "JIANGXIAOMOD-DAWN_POWER.title": "曙光",
+  "JIANGXIAOMOD-DAWN_POWER.title": "Dawn",
+  "JIANGXIAOMOD-DAWN_POWER.smartDescription": "Draw [gold]{M}[/gold] additional card(s) each turn. Longing always chases a glimmer of dawn.",
+  "JIANGXIAOMOD-DAWN_POWER.description": "Draw [gold]{M}[/gold] additional card(s) each turn. Longing always chases a glimmer of dawn.",
+  
+  "JIANGXIAOMOD-YEARNING_HALO_POWER.title": "Yearning Halo",
+  "JIANGXIAOMOD-YEARNING_HALO_POWER.description": "Every attack grants [gold]{M}%[/gold] Lifesteal.",
+  "JIANGXIAOMOD-YEARNING_HALO_POWER.smartDescription": "Every attack grants [gold]{M}%[/gold] Lifesteal.",
 
-  "JIANGXIAOMOD-YEARNING_HALO_POWER.description": "每一次進攻附帶 [gold]{M}%[/gold] 吸血。",
-  "JIANGXIAOMOD-YEARNING_HALO_POWER.smartDescription": "每一次進攻附帶 [gold]{M}%[/gold] 吸血。",
-  "JIANGXIAOMOD-YEARNING_HALO_POWER.title": "眷戀光環"
+  "JIANGXIAOMOD-RESENTMENT_POWER.title": "Resentment",
+  "JIANGXIAOMOD-RESENTMENT_POWER.smartDescription": "Upon being attacked, there is a {MVar}% chance to apply a random debuff to the attacker.",
+  "JIANGXIAOMOD-RESENTMENT_POWER.description": "Upon being attacked, there is a {MVar}% chance to apply a random debuff to the attacker.",
+
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.title": "Tear of Sorrow",
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.description": "At the start of this unit's turn, lose [gold]5%[/gold] of Max HP per stack (Currently: [gold]{M}[/gold] HP).",
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.smartDescription": "At the start of this unit's turn, lose [gold]5%[/gold] of Max HP per stack (Currently: [gold]{M}[/gold] HP)."
 }
