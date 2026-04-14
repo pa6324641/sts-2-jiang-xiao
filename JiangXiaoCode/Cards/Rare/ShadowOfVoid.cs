@@ -90,4 +90,10 @@ public class ShadowOfVoid : JiangXiaoCardModel
         // [修正 CS1503] GainEnergy 參數順序為 (decimal amount, Player player)
         await PlayerCmd.GainEnergy(energyAmount, Owner);
     }
+
+    protected override void OnUpgrade()
+    {
+        // 若需升級效果可在此添加
+        EnergyCost.UpgradeBy(-1);
+    }
 }

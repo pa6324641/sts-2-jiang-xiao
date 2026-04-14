@@ -1,78 +1,91 @@
+using System;
 using System.Linq;
+using System.Collections.Generic;
 using JiangXiaoMod.Code.Relics;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Entities.Players; // 必須新增此命名空間
+using MegaCrit.Sts2.Core.Entities.Players;
 
 namespace JiangXiaoMod.Code.Extensions;
 
+/// <summary>
+/// 技藝類型定義，防止字串拼寫錯誤
+/// </summary>
+public enum BasicArtType
+{
+    Unarmed, Blade, Bow, Dagger, Halberd, Knife
+}
+
 public static class JiangXiaoUtils
 {
-    // [STS2_Optimization] 統一獲取星技等級
-    // 修正點：將 PlayerModel 改為 Player
+    // --- 核心遺物獲取 ---
+
+    /// <summary>
+    /// 獲取星技品質等級 (1-7)
+    /// </summary>
     public static int GetSkillRank(Player? player)
     {
         if (player == null) return 1;
-
-        // 根據 JiangXiaoMod 源碼，玩家對象直接擁有 Relics 屬性 
-        var relic = player.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-        return relic?.SkillRank ?? 1; // 沒找到遺物則預設為 1 級
+        // [STS2_Optimization] 使用 OfType 直接過濾類型
+        var relic = player.Relics.OfType<StarSkillQuality>().FirstOrDefault();
+        return relic?.SkillRank ?? 1;
     }
 
-    // --- 新增：讀取「基礎技藝」遺物實例 ---
+    /// <summary>
+    /// 獲取基礎技藝遺物實例
+    /// </summary>
     public static BasicArts? GetBasicArtsRelic(Player? player)
     {
-        return player?.Relics.FirstOrDefault(r => r is BasicArts) as BasicArts;
+        return player?.Relics.OfType<BasicArts>().FirstOrDefault();
     }
 
-    // --- 新增：讀取特定技藝等級 (Rank) ---
-    // 範例：獲取徒手格鬥等級
-    public static int GetUnarmedRank(Player? player)
+    // --- 技藝等級獲取 (簡化版) ---
+
+    public static int GetUnarmedRank(Player? player) => GetArtRank(player, BasicArtType.Unarmed);
+    public static int GetBladeRank(Player? player)   => GetArtRank(player, BasicArtType.Blade);
+    public static int GetBowRank(Player? player)     => GetArtRank(player, BasicArtType.Bow);
+    public static int GetDaggerRank(Player? player)  => GetArtRank(player, BasicArtType.Dagger);
+    public static int GetHalberdRank(Player? player) => GetArtRank(player, BasicArtType.Halberd);
+    public static int GetCombatKnifeRank(Player? player) => GetArtRank(player, BasicArtType.Knife);
+
+    /// <summary>
+    /// 統一的等級獲取內核
+    /// </summary>
+    public static int GetArtRank(Player? player, BasicArtType type)
     {
         var relic = GetBasicArtsRelic(player);
-        return relic != null ? relic.GetRank(relic.UnarmedPts) : 1;
-    }
-    public static int GetBladeRank(Player? player)
-    {
-        var relic = GetBasicArtsRelic(player);
-        return relic != null ? relic.GetRank(relic.BladePts) : 1;
-    }
-    public static int GetBowRank(Player? player)
-    {
-        var relic = GetBasicArtsRelic(player);
-        return relic != null ? relic.GetRank(relic.BowPts) : 1;
-    }
-    public static int GetDaggerRank(Player? player)
-    {
-        var relic = GetBasicArtsRelic(player);
-        return relic != null ? relic.GetRank(relic.DaggerPts) : 1;
-    }
-    public static int GetHalberdRank(Player? player)
-    {
-        var relic = GetBasicArtsRelic(player);
-        return relic != null ? relic.GetRank(relic.HalberdPts) : 1;
-    }
-    public static int GetCombatKnifeRank(Player? player)
-    {
-        var relic = GetBasicArtsRelic(player);
-        return relic != null ? relic.GetRank(relic.CombatKnifePts) : 1;
+        if (relic == null) return 1;
+
+        int pts = GetArtPoints(player, type);
+        return relic.GetRank(pts);
     }
 
-
-    // --- 新增：萬用數值讀取器 (如果你想根據類型讀取 Pts) ---
-    public static int GetArtPoints(Player? player, string artType)
+    /// <summary>
+    /// 萬用數值讀取器 (使用 Enum 確保安全)
+    /// </summary>
+    public static int GetArtPoints(Player? player, BasicArtType type)
     {
         var relic = GetBasicArtsRelic(player);
         if (relic == null) return 0;
 
-        return artType.ToUpper() switch
+        return type switch
         {
-            "UNARMED" => relic.UnarmedPts,
-            "BLADE"   => relic.BladePts,
-            "BOW"     => relic.BowPts,
-            "DAGGER"  => relic.DaggerPts,
-            "HALBERD" => relic.HalberdPts,
-            "KNIFE"   => relic.CombatKnifePts,
-            _         => 0
+            BasicArtType.Unarmed => relic.UnarmedPts,
+            BasicArtType.Blade   => relic.BladePts,
+            BasicArtType.Bow     => relic.BowPts,
+            BasicArtType.Dagger  => relic.DaggerPts,
+            BasicArtType.Halberd => relic.HalberdPts,
+            BasicArtType.Knife   => relic.CombatKnifePts,
+            _ => 0
         };
+    }
+    
+    // 為了相容性，保留原有的字串版本但標記為過時，或內部轉向 Enum
+    public static int GetArtPoints(Player? player, string artType)
+    {
+        if (Enum.TryParse<BasicArtType>(artType, true, out var type))
+        {
+            return GetArtPoints(player, type);
+        }
+        return 0;
     }
 }

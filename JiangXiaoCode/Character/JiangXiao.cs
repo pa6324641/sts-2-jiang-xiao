@@ -31,6 +31,7 @@ public class JiangXiao : PlaceholderCharacterModel
 	public override Color MapDrawingColor => Color;
 	public override Color NameColor => Color;
 	public override CharacterGender Gender => CharacterGender.Masculine;
+	protected override CharacterModel? UnlocksAfterRunAs => null;
 	public override int StartingHp => 75; 
 	public override int StartingGold => 99;
 	
@@ -110,7 +111,6 @@ public class JiangXiao : PlaceholderCharacterModel
 	public override string CustomCastSfx => "";
 	public override string CustomDeathSfx => "";
 	public override string CharacterSelectSfx => "";
-
 	public override List<string> GetArchitectAttackVfx() =>
 	[
 		"vfx/vfx_attack_blunt",

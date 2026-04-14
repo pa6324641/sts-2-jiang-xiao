@@ -4,15 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
 using BaseLib.Abstracts;
-using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Relics;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Runs;
-using MegaCrit.Sts2.Core.Entities.Relics;
-using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.Entities.Players;
 using JiangXiaoMod.Code.Character;
+using BaseLib.Utils;
+using MegaCrit.Sts2.Core.Entities.Relics;
 
 namespace JiangXiaoMod.Code.Relics;
 
@@ -22,6 +21,7 @@ public sealed class StarSkillQuality : CustomRelicModel
     public override RelicRarity Rarity => RelicRarity.Starter;
     protected override string IconBaseName => "star_skill_quality";
 
+    // 這裡定義的 Rank 順序與你的點數判定邏輯一致
     public enum QualityRank { Bronze = 1, Silver = 2, Gold = 3, Platinum = 4, Diamond = 5, CandleMoon = 6, ScorchingSun = 7 }
 
     private const string VarRank = "rank"; 
@@ -31,25 +31,19 @@ public sealed class StarSkillQuality : CustomRelicModel
 
     public int SkillRank => (int)GetRank();
 
-    public override bool ShouldReceiveCombatHooks => true;
-
     /// <summary>
-    /// 核心修正：安全地獲取技能點數，完全避開 this.Owner 以防止圖鑑崩潰
+    /// 安全地獲取技能點數 (相容圖鑑、讀檔預覽、多人模式)
     /// </summary>
     public int GetPoints()
     {
-        // [關鍵] 不使用 Owner 屬性，改用 RunManager 獲取當前運行的狀態
+        // 優先從運行狀態獲取，若無則嘗試從當前 Owner 獲取（這能覆蓋大多數情況）
         var runState = RunManager.Instance?.DebugOnlyGetState();
-        if (runState == null) return 0; // 圖鑑模式下會直接返回 0
-
-        var player = runState.Players.FirstOrDefault();
+        var player = runState?.Players.FirstOrDefault() ?? Owner;
+        
         if (player == null) return 0;
 
-        // 尋找內視星圖獲取點數
-        var mainRelic = player.Relics.FirstOrDefault(r => 
-            r is InnerStarMap || 
-            r.Id.Entry.Equals("INNER_STAR_MAP", StringComparison.OrdinalIgnoreCase)) as InnerStarMap;
-            
+        // 使用 OfType<T> 效率更高且代碼更簡潔
+        var mainRelic = player.Relics.OfType<InnerStarMap>().FirstOrDefault();
         return mainRelic?.JiangXiaoMod_SkillPoints ?? 0;
     }
 
@@ -57,6 +51,7 @@ public sealed class StarSkillQuality : CustomRelicModel
     {
         int points = GetPoints();
         
+        // 依照你設定的階級閾值
         if (points < 5000) return QualityRank.Bronze;
         if (points < 10000) return QualityRank.Silver;
         if (points < 20000) return QualityRank.Gold;
@@ -66,29 +61,32 @@ public sealed class StarSkillQuality : CustomRelicModel
         return QualityRank.ScorchingSun;
     }
 
-    public float GetValueMultiplier()
-    {
-        return 1.0f + (SkillRank - 1) * 0.5f;
-    }
+    // public float GetValueMultiplier()
+    // {
+    //     // 公式：1.0, 1.5, 2.0... 每階提升 50%
+    //     return 1.0f + (SkillRank - 1) * 0.5f;
+    // }
 
     protected override IEnumerable<DynamicVar> CanonicalVars
     {
         get
         {
-            // 在圖鑑模式下，GetPoints() 為 0，SkillRank 會回傳 Bronze (1)
-            // 這能讓圖鑑正常顯示初始狀態的數值
             int currentRank = SkillRank;
+            // 傳遞 Rank 給 choose 格式化器，傳遞 Multiplier * 100 給描述顯示百分比
             yield return new DynamicVar(VarRank, (decimal)currentRank);
-            yield return new DynamicVar(VarMult, (decimal)(GetValueMultiplier() * 100));
+            // yield return new DynamicVar(VarMult, (decimal)(GetValueMultiplier() * 100));
         }
     }
 
-    public static float GetCurrentMultiplier(IRunState runState)
-    {
-        var player = runState?.Players.FirstOrDefault();
-        var relic = player?.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-        return relic?.GetValueMultiplier() ?? 1.0f;
-    }
+    /// <summary>
+    /// 供卡牌或其他系統靜態調用的倍率接口
+    /// </summary>
+    // public static float GetCurrentMultiplier(IRunState? runState)
+    // {
+    //     var player = runState?.Players.FirstOrDefault();
+    //     var relic = player?.Relics.OfType<StarSkillQuality>().FirstOrDefault();
+    //     return relic?.GetValueMultiplier() ?? 1.0f;
+    // }
 
     public override Task BeforeCombatStart()
     {
@@ -102,9 +100,11 @@ public sealed class StarSkillQuality : CustomRelicModel
         RefreshDisplay();
     }
 
+    public override bool ShouldReceiveCombatHooks => true;
+
     public void RefreshDisplay()
     {
+        // 清除快取以強制刷新敘述中的 {rank} 與 {multiplier}
         DynamicVarsField?.SetValue(this, null);
-        this.Status = this.Status; 
     }
 }

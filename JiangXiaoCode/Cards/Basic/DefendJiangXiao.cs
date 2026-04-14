@@ -1,88 +1,100 @@
-﻿using BaseLib.Abstracts;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using BaseLib.Abstracts;
 using BaseLib.Extensions;
-using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.ValueProps;
-using MegaCrit.Sts2.Core.Models; // 引入 STS2 模型基類
-using JiangXiaoMod.Code.Character;
-using JiangXiaoMod.Code.Extensions;
-using JiangXiaoMod.Code.Relics; // 確保引用了遺物所在的命名空間
-using System.Linq;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.HoverTips;
+using JiangXiaoMod.Code.Extensions;
 using JiangXiaoMod.Code.Keywords;
+using BaseLib.Utils;
+using JiangXiaoMod.Code.Character;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace JiangXiaoMod.Code.Cards.Basic;
 
 [Pool(typeof(JiangXiaoCardPool))]
 public sealed class DefendJiangXiao : CustomCardModel
 {
+    private const decimal BaseBlock = 5m;
+    private const decimal UpgradeBlock = 3m;
+    private const decimal RankBonus = 3m;
+
     public DefendJiangXiao() : base(1, CardType.Skill, CardRarity.Basic, TargetType.Self)
     {
     }
 
+    // STS2 屬性：標記此卡會獲得格擋，利於 AI 識別與 UI 顯示
     public override bool GainsBlock => true;
 
     protected override HashSet<CardTag> CanonicalTags => [CardTag.Defend];
+    
+    // 必須包含星技關鍵字
+    public override HashSet<CardKeyword> CanonicalKeywords => [JiangXiaoModKeywords.Star];
 
-    // 初始化基礎格擋數值為 5
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar(5m, ValueProp.Move)];
-
-    protected override IEnumerable<IHoverTip> ExtraHoverTips => [
-        HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star)
-    ];
+    // 初始化基礎格擋變量
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar(BaseBlock, ValueProp.Move)];
 
     public override string PortraitPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".CardImagePath();
 
     /// <summary>
-    /// 獲取當前星技品質等級。
-    /// 這裡透過 Owner (Player) 的遺物欄位尋找 StarSkillQuality。
-    /// </summary>
-    private int GetQualityRank()
-    {
-        if (Owner == null) return 1;
-        var relic = Owner.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-        return relic?.SkillRank ?? 1;
-    }
-
-    /// <summary>
-    /// 更新格擋數值的核心邏輯：基礎值 + (等級 - 1) * 3
+    /// 核心邏輯：根據當前星技品質等級更新格擋基礎值。
+    /// 公式：(基礎 5 + 升級 3) + (等級 - 1) * 3
     /// </summary>
     public void UpdateStatsBasedOnRank()
     {
-        int rank = GetQualityRank();
-        // STS2 升級邏輯：基礎 5，升級後為 8 (5+3)
-        decimal baseBlock = IsUpgraded ? 8m : 5m; 
+        // 安全檢查：確保 DynamicVars 已經被系統初始化
+        if (DynamicVars?.Block == null) return;
 
-        // 動態更新 Block 的 BaseValue，這會同步觸發 UI 上的文字變動
-        // STS2 的 LocString 會捕捉 BaseValue 的變化並渲染
-        DynamicVars.Block.BaseValue = baseBlock + (rank - 1) * 3m;
+        // 調用 JiangXiaoUtils 獲取遺物提供的品質等級 (1-7)
+        int rank = JiangXiaoUtils.GetSkillRank(Owner);
+        decimal currentBase = IsUpgraded ? (BaseBlock + UpgradeBlock) : BaseBlock;
+        
+        // 更新 BaseValue 會觸發 STS2 的 LocString 自動重繪 UI 數值
+        DynamicVars.Block.BaseValue = currentBase + (rank - 1) * RankBonus;
     }
 
-    // 在戰鬥開始前確保數值已根據等級刷新
+    // --- 確保數值即時更新的生命週期掛鉤 ---
+
     public override Task BeforeCombatStart()
     {
         UpdateStatsBasedOnRank();
         return base.BeforeCombatStart();
     }
 
+    public override Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
+    {
+        // 當卡片在抽牌堆、棄牌堆、手牌間移動時觸發
+        if (card == this) UpdateStatsBasedOnRank();
+        return base.AfterCardChangedPiles(card, oldPileType, source);
+    }
+
+    public override Task AfterCardDrawn(PlayerChoiceContext choiceContext, CardModel card, bool fromHandDraw)
+    {
+        // 確保抽到手上時數值是最新的
+        if (card == this) UpdateStatsBasedOnRank();
+        return base.AfterCardDrawn(choiceContext, card, fromHandDraw);
+    }
+
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        // 打出時再次檢查數值，確保在戰鬥中若等級發生變動（如某些機制）能即時反映
+        // 打出時再次刷新，防止極端情況下的數值落後
         UpdateStatsBasedOnRank();
 
-        // 使用 CreatureCmd 執行格擋指令，直接傳入更新後的 DynamicVars.Block
+        // 執行格擋指令：作用於玩家自己，使用更新後的 DynamicVars.Block
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
     }
 
     protected override void OnUpgrade()
     {
-        // 這是 STS2 的標準升級方式，增加 3 點基礎格擋
-        DynamicVars.Block.UpgradeValueBy(3m);
+        // 升級時降低消耗，數值更新交給 UpdateStatsBasedOnRank 統一處理
         EnergyCost.UpgradeBy(-1);
-        // 升級後立即重新計算品質加成
-        UpdateStatsBasedOnRank();
+        UpdateStatsBasedOnRank(); 
     }
 }

@@ -1,112 +1,93 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// ... (保留原有的 using)
+using System.Reflection;
 using BaseLib.Abstracts;
 using BaseLib.Utils;
-using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Models.Cards;
-using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Commands; 
-using MegaCrit.Sts2.Core.ValueProps;
-using JiangXiaoMod.Code.Powers;
 using JiangXiaoMod.Code.Character;
-using BaseLib.Extensions;
 using JiangXiaoMod.Code.Extensions;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Entities.Creatures;
-using MegaCrit.Sts2.Core.HoverTips;
 using JiangXiaoMod.Code.Keywords;
-using JiangXiaoMod.Code.Relics;
+using JiangXiaoMod.Code.Powers;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Enchantments;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Runs.History;
+using MegaCrit.Sts2.Core.ValueProps;
+using MegaCrit.Sts2.GameInfo.Objects;
 
 namespace JiangXiaoMod.Code.Cards.Basic;
 
 [Pool(typeof(JiangXiaoCardPool))]
-// 使用與 DefendWatcher 相同的簡潔建構子格式
 public sealed class Ruinance() : CustomCardModel(
-    1,                    // 費用
-    CardType.Power,       // 改為 Power，因為沒有攻擊動作
-    CardRarity.Basic,     // 稀有度
-    TargetType.Self       // 目標改為 Self，因為只對自己加格擋和能力
+    1, 
+    CardType.Power, 
+    CardRarity.Basic, 
+    TargetType.Self 
 )
 {
-
-    // 這裡定義卡牌上顯示的數值
     protected override IEnumerable<DynamicVar> CanonicalVars => [
         new BlockVar(IsUpgraded ? 6m : 3m, ValueProp.Move),
-        new DynamicVar("M", IsUpgraded ? 1m : 1m) ,
-
+        new DynamicVar("M", 1m) // M 在這裡作為觸發標記或倍率，如果不需要可移除
     ];
-    
+
+    // 新增：提取計算化解值的邏輯，僅在打出時呼叫一次
+    private int CalculateResistAmount(Player? player)
+    {
+        int rankLevel = JiangXiaoUtils.GetSkillRank(player);
+        return 3 + (rankLevel - 1) * 3;
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
+
+        // 計算當前星技等級對應的數值
+        int finalResist = CalculateResistAmount(Owner); 
+
+        // 將數值作為第二個參數傳入，這會直接賦值給能力的 Amount
+        await PowerCmd.Apply<RuinancePower>(Owner.Creature, finalResist, Owner.Creature, this);
+    }
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips => [
         HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star),
         HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Passive),
-        HoverTipFactory.FromPower<RuinancePower>(),
-        HoverTipFactory.Static(StaticHoverTip.Block)
-        
+        HoverTipFactory.Static(StaticHoverTip.Block),
+        // 直接使用泛型，讓系統調用 ModelDb 中的單例，不要 new
+        HoverTipFactory.FromPower<RuinancePower>()
+       
     ];
-
-    // 卡牌圖片路徑 (參考 Watcher 範例)
-    public override string PortraitPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".CardImagePath();
-    
-    protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    public override async Task BeforeHandDrawLate(Player player, PlayerChoiceContext choiceContext, CombatState combatState)
     {
-        // 1. 獲得格擋 (直接傳入 DynamicVars.Block 物件)
-        await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
+        await base.BeforeHandDrawLate(player, choiceContext, combatState);
 
-        // 2. 賦予忍耐能力 (傳入變量 M 的數值)
-        // 注意：確保 RuinancePower.cs 裡的建構子 public RuinancePower(int amount) 存在
-        await PowerCmd.Apply<RuinancePower>(
-            Owner.Creature, 
-            (int)DynamicVars["M"].IntValue, 
-            Owner.Creature, 
-            this
-        );
-    }
+        // 1. 檢查玩家與戰鬥狀態安全性
+        // [STS2_Optimization] 確保 PlayerCombatState 存在以避免空值引用
+        if (player == null || player.PlayerCombatState == null) return;
 
-    protected override void OnUpgrade()
-    {
-        // 升級時數值加強
-        DynamicVars.Block.UpgradeValueBy(3m);
-    }
-
-    public override async Task BeforeCombatStartLate()
-    {
-        await base.BeforeCombatStartLate();
-
-        var player = this.Owner;
-        var combat = this.CombatState;
-
-        if (player == null || combat == null || player.PlayerCombatState == null) return;
-
-        var drawPile = player.PlayerCombatState.DrawPile;
-
-        // 檢查卡牌是否在抽牌堆
-        if (drawPile.Cards.Contains(this))
+        // 2. 判斷卡牌位置
+        // [STS2_Logic] 使用 PlayerCombatState.DrawPile 檢查卡牌是否在抽牌堆中 
+        if (player.PlayerCombatState.DrawPile.Cards.Contains(this))
         {
-            // 能力牌通常不需要目標，所以根據 TargetType 判斷是否需要傳入敵人
-            Creature? target = (this.TargetType == TargetType.None) 
-                            ? null 
-                            : combat.Enemies.FirstOrDefault(e => e.IsAlive);
+            // 3. 定義打出目標
+            // 若卡牌目標類型為自身 (Self)，則指向玩家 Creature；否則由 AutoPlay 邏輯處理 
+            Creature? target = (this.TargetType == TargetType.Self) ? player.Creature : null;
 
-            // [修正 CS8625] 使用 null! 繞過編譯器檢查
-            PlayerChoiceContext context = new GameActionPlayerChoiceContext(null!);
-
-            // STS2 方式：從抽牌堆自動丟出並打出
-            await CardCmd.AutoPlay(context, this, target);
-
-            // 核心邏輯：若是能力牌，確保它打出後不會被移出戰鬥狀態 (防止圖標消失)
-            if (this.Type == CardType.Power)
-            {
-                this.HasBeenRemovedFromState = false;
-            }
-            
-            /* STS1 註解：
-            在 STS1 中我們會用 AbstractDungeon.actionManager.addToBottom(new NewQueueCardAction(...));
-            在 STS2 中，這行 await CardCmd.AutoPlay 會處理所有事情，包含從抽牌堆移除的動畫。
-            */
+            // 4. [STS2_API] 執行自動打出
+            // 使用傳入的 choiceContext 替代手動創建的 Context，這在多人模式或複雜排程下更穩定 
+            // AutoPlay 會處理 CardPile 的移出手續，不需額外標記 HasBeenRemovedFromState
+            await CardCmd.AutoPlay(choiceContext, this, target);
         }
     }
 
-
+      public override HashSet<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
+    
+    protected override void OnUpgrade()
+    {
+        DynamicVars.Block.UpgradeValueBy(3m);
+    }
 }

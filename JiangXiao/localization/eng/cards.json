@@ -56,7 +56,7 @@
 	"JIANGXIAOMOD-SECONDARY_FACE.description": "Choose 1 card in hand; add {M} copies of it to your hand. Copies cost 0 and have [gold]Exhaust[/gold].",
 
 	"JIANGXIAOMOD-TEAR_OF_SORROW.title": "Tear of Sorrow",
-	"JIANGXIAOMOD-TEAR_OF_SORROW.description": "[blue]Star Skill[/blue].\nGive {M} stacks of [gold]Tear of Sorrow[/gold] to all units.\n(If Quality is [red]Silver[/red] or higher, only applies to all enemies).",
+	"JIANGXIAOMOD-TEAR_OF_SORROW.description": "[blue]Star Skill[/blue].\nGive {M} stacks of [gold]Tear of Sorrow[/gold] to all units.\n(If Quality is [red]Platinum[/red] or higher, only applies to all enemies).",
 
 	"JIANGXIAOMOD-CLEAN_TEARS.title": "Purifying Tears",
 	"JIANGXIAOMOD-CLEAN_TEARS.description": "[blue]Star Skill[/blue].\nRemove [blue]Status[/blue] & [blue]Curse[/blue] cards from yourself and allies; {M:diff()} card(s) each from Draw Pile/Hand/Discard Pile.",

@@ -18,7 +18,7 @@ using MegaCrit.Sts2.Core.Runs;
 using BaseLib.Utils;
 using JiangXiaoMod.Code.Character;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer; // 必須引用，為了使用 RunManager
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace JiangXiaoMod.Code.Cards.Rare
 {
@@ -33,15 +33,18 @@ namespace JiangXiaoMod.Code.Cards.Rare
             HoverTipFactory.FromPower<RegenPower>(),
             HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star),
             HoverTipFactory.FromPower<ChengYinPower>()
-           
         ];
+
+        public override Task BeforeCombatStart()
+        {
+            UpdateStatsBasedOnRank();
+            return base.BeforeCombatStart();
+        }
 
         public int GetQualityRank()
         {
             try {
-                // [核心修正] 
-                // 1. 在 CardModel 中，'Owner' 屬性就是發動這張卡的 Player。
-                // 2. 如果 Owner 為 null (例如在圖鑑中)，則使用你提供的 DebugOnlyGetState() 獲取。
+                // [核心修正] 優先使用 Owner。若在圖鑑中(Owner為null)，則從 RunManager 獲取狀態。
                 var player = Owner ?? RunManager.Instance.DebugOnlyGetState()?.Players.FirstOrDefault();
                 var relic = player?.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
                 return relic?.SkillRank ?? 1;
@@ -52,27 +55,31 @@ namespace JiangXiaoMod.Code.Cards.Rare
         public void UpdateStatsBasedOnRank()
         {
             int rank = GetQualityRank();
+            // 基礎 3 層，每級品質 +1
             decimal finalRegenValue = 3m + (rank - 1);
             DynamicVars[_mKey].BaseValue = finalRegenValue;
-        }
-        public override Task BeforeCombatStart()
-        {
-            UpdateStatsBasedOnRank();
-            return base.BeforeCombatStart();
         }
 
         protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
         {
+            // 1. 強制更新當前數值
             UpdateStatsBasedOnRank();
-            int regenAmount = (int)DynamicVars[_mKey].BaseValue;
+            decimal regenAmount = DynamicVars[_mKey].BaseValue;
 
-            // 這裡傳入 regenAmount，它會被保存在 ChengYinPower 的 Amount 屬性中
-            await PowerCmd.Apply<ChengYinPower>(
-                new[] { Owner.Creature }, 
-                regenAmount, 
-                Owner.Creature, 
-                this
-            );
+            // 2. [核心修正] 獲取戰鬥狀態中的所有盟友
+            // 在 STS2 中，CombatState.Allies 包含了所有友方單位（包含玩家自己與寵物/召喚物）
+            var combat = this.CombatState;
+            if (combat != null)
+            {
+                // [STS2_API] 使用 PowerCmd.Apply 批量對所有盟友施加能力
+                // 傳入 combat.Allies 作為目標集合
+                await PowerCmd.Apply<ChengYinPower>(
+                    combat.Allies, 
+                    regenAmount, 
+                    Owner.Creature, 
+                    this
+                );
+            }
         }
     }
 }

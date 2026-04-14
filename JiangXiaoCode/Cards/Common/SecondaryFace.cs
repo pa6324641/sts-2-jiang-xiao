@@ -47,10 +47,10 @@ public class SecondaryFace : JiangXiaoCardModel
         var relic = player.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
         int currentRank = relic?.SkillRank ?? 1;
 
-        // 設定 M 值：rank 1-3 -> 1, rank 4-5 -> 2, rank 6-7 -> 7
+        // 設定 M 值：rank 1-3 -> 1, rank 4-5 -> 2, rank 6-7 -> 3
         decimal mValue = currentRank switch
         {
-            >= 6 => 7m,
+            >= 6 => 3m,
             >= 4 => 2m,
             _ => 1m
         };
@@ -110,6 +110,12 @@ public class SecondaryFace : JiangXiaoCardModel
             // 5. 加入戰鬥手牌 (true 會觸發卡片飛入手牌的動畫)
             await CardPileCmd.AddGeneratedCardToCombat(copy, PileType.Hand, true);
         }
+    }
+
+    protected override void OnUpgrade()
+    {
+        // 此牌主要隨品質提升，若需升級效果可在此添加
+        EnergyCost.UpgradeBy(-1);
     }
 
     // 💡 解決 Missing Sprite 報錯 (若無專屬圖，可先指定為打擊的圖)

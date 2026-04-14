@@ -56,7 +56,7 @@
 	"JIANGXIAOMOD-SECONDARY_FACE.description": "選擇手牌中1張牌，將{M}張複本加入手牌。複本耗能變為0並具有[gold]消耗[/gold] 。",
 
 	"JIANGXIAOMOD-TEAR_OF_SORROW.title": "傷淚",
-  	"JIANGXIAOMOD-TEAR_OF_SORROW.description": "[blue]星技[/blue]。\n給予所有單位{M}層[gold]悲傷之淚[/gold]。\n(星技品質為[red]白銀[/red]以上時，改為僅給予全體敵人)。",
+  	"JIANGXIAOMOD-TEAR_OF_SORROW.description": "[blue]星技[/blue]。\n給予所有單位{M:diff()}層[gold]悲傷之淚[/gold]。\n(星技品質為[red]白金[/red]以上時，改為僅給予全體敵人)。",
 
 	"JIANGXIAOMOD-CLEAN_TEARS.title": "淨淚",
 	"JIANGXIAOMOD-CLEAN_TEARS.description": "[blue]星技[/blue]。\n清除自身和隊友的 [blue]狀態[/blue]&[blue]詛咒[/blue] 牌，從抽牌堆/手牌/棄牌堆中各{M:diff()}張。",

@@ -3,6 +3,10 @@
   "JIANGXIAOMOD-INNER_STAR_MAP.description": "江曉專用。核心遺物。 \n 每當戰鬥勝利時獲得技能點 (一般/事件 +1250，精英 +2500，首領 +5000)。 \n 目前擁有 [gold]{points:diff()}[/gold] 技能點。 \n (獲得此遺物時，自動獲得星圖、星技品質、星力等級遺物。)",
   "JIANGXIAOMOD-INNER_STAR_MAP.flavor": "這是一個存在於腦海中的神奇星圖，是江曉毒奶之路的起點。",
 
+  "JIANGXIAOMOD-INNER_STAR_MAP_PLUS.title": "內視星圖+",
+  "JIANGXIAOMOD-INNER_STAR_MAP_PLUS.description": "江曉專用。核心遺物。 \n 每當戰鬥勝利時獲得技能點 (一般/事件 +2500，精英 +5000，首領 +10000)。 \n 目前擁有 [gold]{points:diff()}[/gold] 技能點。 \n (獲得此遺物時，自動獲得星圖、星技品質、星力等級遺物。)",
+  "JIANGXIAOMOD-INNER_STAR_MAP_PLUS.flavor": "這是一個存在於腦海中的神奇星圖，是江曉毒奶之路的起點。",
+
   "JIANGXIAOMOD-STAR_POWER_LEVEL.title": "星力等級",
   "JIANGXIAOMOD-STAR_POWER_LEVEL.description": "當前星力等級：[gold]{level:choose(1|2|3|4|5|6):星塵期|星雲期|星河期|星海期|星空期|星盡期}[/gold] 。\n額外獲得[gold] {energy} [/gold]點 能量 。",
   "JIANGXIAOMOD-STAR_POWER_LEVEL.flavor": "星力如潮汐般湧動，每一顆星辰的點亮都意味著質的飛躍。",
