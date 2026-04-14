@@ -30,26 +30,49 @@ public sealed class StarPowerLevel : CustomRelicModel
     /// <summary>
     /// [STS2_API] 正確的能量修正勾子
     /// </summary>
-    /// <param name="player">當前玩家實例</param>
+    /// <param name="player">目前正在計算/結算能量上限的玩家對象</param>
     /// <param name="amount">修正鏈中目前的能量上限值</param>
     /// <returns>修正後的能量上限</returns>
     public override decimal ModifyMaxEnergy(Player player, decimal amount)
     {
-        // 基礎邏輯：等級 1+3=4, 2+3=5... 
-        // 這裡我們只回傳「加成值」，讓系統自動與基礎值累加
-        int bonus = GetLevel();
+        // [STS2_Multiplayer_Safety] 核心修正：
+        // 檢查正在結算的 player 是否就是本遺物的持有者 (this.Owner)。
+        // 如果不是，則直接回傳原始數值，避免幫隊友（或其他江曉）額外增加能量。
+        if (player != this.Owner)
+        {
+            return amount;
+        }
+
+        // 僅對持有者生效
+        int bonus = GetLevel(player);
         return amount + (decimal)bonus;
     }
 
-    public int GetLevel()
+    /// <summary>
+    /// 根據玩家的星點數計算當前星力等級
+    /// </summary>
+    /// <param name="specificPlayer">指定的玩家，若為 null 則自動尋找持有者或環境對象</param>
+    public int GetLevel(Player? specificPlayer = null)
     {
-        var runState = RunManager.Instance?.DebugOnlyGetState();
-        var player = runState?.Players.FirstOrDefault() ?? Owner;
-        if (player == null) return 1;
+        // 優先順序：傳入參數 > 遺物持有者 > 戰局首位玩家(預覽用)
+        Player? target = specificPlayer;
+        
+        if (target == null && IsMutable)
+        {
+            // 在戰鬥或非圖鑑狀態下，嘗試獲取 Owner
+            try { target = Owner; } catch { }
+        }
 
-        var mainRelic = player.Relics.OfType<InnerStarMap>().FirstOrDefault();
+        // 圖鑑/預覽邏輯：若仍無對象，則取當前運作狀態中的第一個玩家
+        target ??= RunManager.Instance?.DebugOnlyGetState()?.Players.FirstOrDefault();
+        
+        if (target == null) return 1;
+
+        // 從目標玩家的遺物中尋找核心遺物 InnerStarMap
+        var mainRelic = target.Relics.OfType<InnerStarMap>().FirstOrDefault();
         int points = mainRelic?.JiangXiaoMod_SkillPoints ?? 0;
 
+        // 根據點數判定等級 (1-6)
         if (points < 5000) return 1;
         if (points < 20000) return 2;
         if (points < 30000) return 3;
@@ -58,23 +81,11 @@ public sealed class StarPowerLevel : CustomRelicModel
         return 6;
     }
 
-    // public override async Task AfterSideTurnStart(CombatSide side, CombatState combatState)
-    // {
-    //     var owner = this.Owner;
-    //     if (owner == null || side != owner.Creature.Side) return;
-
-    //     // 每回合開始時，根據當前等級獲得能量 (補充到新的上限或額外獲得)
-    //     this.Flash();
-    //     int energyGain = GetLevel();
-    //     await PlayerCmd.GainEnergy(energyGain, owner);
-        
-    //     await base.AfterSideTurnStart(side, combatState);
-    // }
-
     protected override IEnumerable<DynamicVar> CanonicalVars
     {
         get
         {
+            // 此處呼叫時 targetPlayer 會走預覽/持有者邏輯
             int currentLevel = GetLevel();
             yield return new DynamicVar(VarLevel, (decimal)currentLevel);
             yield return new DynamicVar(VarEnergy, (decimal)currentLevel); 
@@ -95,6 +106,7 @@ public sealed class StarPowerLevel : CustomRelicModel
 
     public void RefreshDisplay()
     {
+        // 重置 DynamicVar 緩存以刷新文本顯示
         DynamicVarsField?.SetValue(this, null);
     }
 
