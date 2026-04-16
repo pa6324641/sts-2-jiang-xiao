@@ -13,6 +13,16 @@
 
 	"JIANGXIAOMOD-BLESSING.title": "Blessing",
 	"JIANGXIAOMOD-BLESSING.description": "[blue]Star Skill[/blue].\nHeal an ally for {HealAmount:diff()} HP.",
+	"JIANGXIAOMOD-BLESSING_ENEMY_TOKEN.title": "Blessing: Enemy",
+	"JIANGXIAOMOD-BLESSING_ENEMY_TOKEN.description": "Heal an enemy for {HealAmount:diff()} HP and [gold]Stun[/gold] them.",
+	"JIANGXIAOMOD-BLESSING_ALLY_TOKEN.title": "Blessing: Ally",
+	"JIANGXIAOMOD-BLESSING_ALLY_TOKEN.description": "Heal an ally for {HealAmount:diff()} HP.",
+	"JIANGXIAOMOD-BLESSING_ALL_ALLY_TOKEN.title": "Blessing: All Allies",
+	"JIANGXIAOMOD-BLESSING_ALL_ALLY_TOKEN.description": "Heal all allies for {HealAmount:diff()} HP.",
+	"JIANGXIAOMOD-BLESSING_ALL_ENEMY_TOKEN.title": "Blessing: All Enemies",
+	"JIANGXIAOMOD-BLESSING_ALL_ENEMY_TOKEN.description": "Heal all enemies for {HealAmount:diff()} HP and [gold]Stun[/gold] them.",
+	"JIANGXIAOMOD-BLESSING_SELF_TOKEN.title": "Blessing: Self",
+	"JIANGXIAOMOD-BLESSING_SELF_TOKEN.description": "Heal yourself for {HealAmount:diff()} HP.",
 
 	"JIANGXIAOMOD-CHENG_YIN.description": "[blue]Star Skill[/blue].\nApply [gold]Seal Bearer[/gold] to an ally.\nWhen damaged, receive continuous healing; the medical light of the guiding bell.",
 	"JIANGXIAOMOD-CHENG_YIN.title": "Seal Bearer",
@@ -27,7 +37,7 @@
 	"JIANGXIAOMOD-YEARNING.title": "Yearning Halo",
 
 	"JIANGXIAOMOD-RETROGRADE_LIGHT.title": "Retrograde Light",
-	"JI retrograde_light.description": "Choose: Average HP with an [gold]Enemy[/gold] or an [gold]Ally[/gold].",
+	"JIANGXIAOMOD-RETROGRADE_LIGHT.description": "Choose: Average HP with an [gold]Enemy[/gold] or an [gold]Ally[/gold].",
 	"JIANGXIAOMOD-RETROGRADE_LIGHT_ENEMY.title": "Retrograde Light: Enemy",
 	"JIANGXIAOMOD-RETROGRADE_LIGHT_ENEMY.description": "[gold]Exhaust[/gold]. Choose an enemy; average your HP with theirs.",
 	"JIANGXIAOMOD-RETROGRADE_LIGHT_ALLY.title": "Retrograde Light: Ally",
@@ -53,16 +63,16 @@
 	"JIANGXIAOMOD-REST_TOKEN.title": "Rest",
 
 	"JIANGXIAOMOD-SECONDARY_FACE.title": "Sub-Aspect",
-	"JIANGXIAOMOD-SECONDARY_FACE.description": "Choose 1 card in hand; add {M} copies of it to your hand. Copies cost 0 and have [gold]Exhaust[/gold].",
+	"JIANGXIAOMOD-SECONDARY_FACE.description": "Choose 1 card in hand; add {M:diff()} copies of it to your hand. Copies cost 0 and have [gold]Exhaust[/gold].",
 
 	"JIANGXIAOMOD-TEAR_OF_SORROW.title": "Tear of Sorrow",
-	"JIANGXIAOMOD-TEAR_OF_SORROW.description": "[blue]Star Skill[/blue].\nGive {M} stacks of [gold]Tear of Sorrow[/gold] to all units.\n(If Quality is [red]Platinum[/red] or higher, only applies to all enemies).",
+	"JIANGXIAOMOD-TEAR_OF_SORROW.description": "[blue]Star Skill[/blue].\nGive {M:diff()} stacks of [gold]Tear of Sorrow[/gold] to all units.\n(If Quality is [red]Platinum[/red] or higher, only applies to all enemies).",
 
 	"JIANGXIAOMOD-CLEAN_TEARS.title": "Purifying Tears",
 	"JIANGXIAOMOD-CLEAN_TEARS.description": "[blue]Star Skill[/blue].\nRemove [blue]Status[/blue] & [blue]Curse[/blue] cards from yourself and allies; {M:diff()} card(s) each from Draw Pile/Hand/Discard Pile.",
 
 	"JIANGXIAOMOD-UNARMED_STRIKE.title": "Unarmed Strike",
-	"JIANGXIAOMOD-UNARMED_STRIKE.description": "Deal {Damage:diff()} damage. Draw {M} card(s).\n(Scales with [gold]Unarmed Combat Rank[/gold]).",
+	"JIANGXIAOMOD-UNARMED_STRIKE.description": "Deal {Damage:diff()} damage. Draw {M:diff()} card(s).\n(Scales with [gold]Unarmed Combat Rank[/gold]).",
 
 	"JIANGXIAOMOD-XIA_BLADE_STYLE1.title": "Xia Blade Style 1: Cross-Cut Love",
 	"JIANGXIAOMOD-XIA_BLADE_STYLE1.description": "Deal {Damage:diff()} damage and gain {Block:diff()} [gold]Block[/gold].\n(Scales with [gold]Xia Style Blade Rank[/gold]).",
@@ -77,7 +87,7 @@
 	"JIANGXIAOMOD-XIA_BLADE_STYLE_TRUE.description": "Deal {Damage:diff()} damage and gain {Block:diff()} [gold]Block[/gold].\n(Scales with [gold]Xia Style Blade Rank[/gold]).\nDamage is x4 if you have Xia Blade Styles 1, 2, and 3.",
 
 	"JIANGXIAOMOD-BASIC_ARROW.title": "Basic Arrow",
-	"JIANGXIAOMOD-BASIC_ARROW.description": "Deal {Damage:diff()} damage.\nDraw {M} card(s) with [blue]Archery Mastery[/blue].\n(Scales with [gold]Archery Mastery Rank[/gold]).",
+	"JIANGXIAOMOD-BASIC_ARROW.description": "Deal {Damage:diff()} damage.\nDraw {M:diff()} card(s) with [blue]Archery Mastery[/blue].\n(Scales with [gold]Archery Mastery Rank[/gold]).",
 
 	"JIANGXIAOMOD-STAR_POWER_ARROW.title": "Star Power Arrow",
 	"JIANGXIAOMOD-STAR_POWER_ARROW.description": "Deal {Damage:diff()} damage.\n(Scales with [gold]Archery Mastery Rank[/gold] & [gold]Star Power Level[/gold]).",

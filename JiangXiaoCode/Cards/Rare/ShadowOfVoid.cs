@@ -11,6 +11,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
+using MegaCrit.Sts2.Core.Runs; // 確保引用了 Runs 以存取 RunManager.Instance
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +33,8 @@ public class ShadowOfVoid : JiangXiaoCardModel
 
     public void UpdateStatsBasedOnRank()
     {
-        var relic = Owner?.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
+        if (Owner == null) return;
+        var relic = Owner.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
         int rank = relic?.SkillRank ?? 1;
 
         decimal calculatedM = rank switch
@@ -42,7 +44,6 @@ public class ShadowOfVoid : JiangXiaoCardModel
             _ => 3m
         };
 
-        // [修正 CS8602] 使用 TryGetValue 確保安全存取
         if (DynamicVars.TryGetValue("M", out var mVar))
         {
             mVar.BaseValue = calculatedM;
@@ -54,14 +55,12 @@ public class ShadowOfVoid : JiangXiaoCardModel
         if (Owner == null || CombatState == null) return;
 
         UpdateStatsBasedOnRank();
-        
-        // [修正 CS8602] 獲取能量數值
         decimal energyAmount = DynamicVars.TryGetValue("M", out var mVar) ? mVar.BaseValue : 1m;
 
         var tokenStrengthen = CombatState.CreateCard<StrengthenToken>(Owner);
         var tokenRest = CombatState.CreateCard<RestToken>(Owner);
 
-        // 觸發選擇界面
+        // 1. 執行選擇介面並等待結果
         var selectedToken = await CardSelectCmd.FromChooseACardScreen(
             choiceContext, 
             new List<CardModel> { tokenStrengthen, tokenRest }, 
@@ -70,30 +69,31 @@ public class ShadowOfVoid : JiangXiaoCardModel
 
         if (selectedToken != null)
         {
-            // [修正 CS1503] CardPileCmd.Add 第三個參數是 CardPilePosition 而非 Player。
-            // 既然卡片在 Create 時已指定 Owner，直接 Add 即可。
+            // [關鍵修正：多人模式穩定性]
+            // 使用 Task.Yield() 讓出控制權，讓 Godot 有時間清理上一幀的 "Completed" 訊號。
+            // 這能直接解決 "Signal 'Completed' is already connected" 的報錯問題。
+            await Task.Yield();
+
+            // 2. 為自己添加 Token
             await CardPileCmd.Add(selectedToken, PileType.Hand);
 
-            // 同步給隊友
+            // 3. 為所有隊友同步添加 Token
             foreach (var ally in CombatState.Allies)
             {
-                // ally 是 Creature, Owner 是 Player。需要比較實體：ally != Owner.Creature
-                if (ally != null && ally != Owner.Creature && ally.Player != null)
+                if (ally != null && ally.Player != null && ally != Owner.Creature)
                 {
-                    // [修正 CS1503] CreateCard 的第一個參數應傳入 CardModel (作為模板)，而非 ModelId
                     var allyToken = CombatState.CreateCard(selectedToken, ally.Player);
                     await CardPileCmd.Add(allyToken, PileType.Hand);
                 }
             }
-        }
 
-        // [修正 CS1503] GainEnergy 參數順序為 (decimal amount, Player player)
-        await PlayerCmd.GainEnergy(energyAmount, Owner);
+            // 4. 獲得能量
+            await PlayerCmd.GainEnergy(energyAmount, Owner);
+        }
     }
 
     protected override void OnUpgrade()
     {
-        // 若需升級效果可在此添加
-        EnergyCost.UpgradeBy(-1);
+        EnergyCost.UpgradeBy(-3);
     }
 }

@@ -3,6 +3,10 @@
   "JIANGXIAOMOD-INNER_STAR_MAP.description": "Jiang Xiao Exclusive. Core Relic. \n Gain Skill Points upon winning a battle (Normal/Event +1250, Elite +2500, Boss +5000). \n Currently have [gold]{points:diff()}[/gold] Skill Points. \n (Upon obtaining this relic, automatically gain Star Map, Star Skill Quality, and Star Power Level relics.)",
   "JIANGXIAOMOD-INNER_STAR_MAP.flavor": "A miraculous star map existing within the mind, the starting point of Jiang Xiao's path as a toxic healer.",
 
+  "JIANGXIAOMOD-INNER_STAR_MAP_PLUS.title": "Inner Star Map+",
+  "JIANGXIAOMOD-INNER_STAR_MAP_PLUS.description": "Jiang Xiao Exclusive. Core Relic. \n Gain Skill Points upon winning a battle (Normal/Event +2500, Elite +5000, Boss +10000). \n Currently have [gold]{points:diff()}[/gold] Skill Points. \n (Upon obtaining this relic, automatically gain Star Map, Star Skill Quality, and Star Power Level relics.)",
+  "JIANGXIAOMOD-INNER_STAR_MAP_PLUS.flavor": "A miraculous star map existing within the mind, the starting point of Jiang Xiao's path as a toxic healer.",
+
   "JIANGXIAOMOD-STAR_POWER_LEVEL.title": "Star Power Level",
   "JIANGXIAOMOD-STAR_POWER_LEVEL.description": "Current Star Power Level: [gold]{level:choose(1|2|3|4|5|6):Stardust|Nebula|Galaxy|Star Sea|Star Sky|Star End}[/gold]. \n Gain [gold]{energy}[/gold] additional Energy.",
   "JIANGXIAOMOD-STAR_POWER_LEVEL.flavor": "Star power ebbs and flows like the tide; every star lit represents a qualitative leap.",

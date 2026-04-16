@@ -18,12 +18,14 @@ using JiangXiaoMod.Code.Cards.Common;
 using JiangXiaoMod.Code.Cards.Uncommon;
 using JiangXiaoMod.Code.Extensions;
 using MegaCrit.Sts2.Core.Nodes.Combat;
+using BaseLib.Patches.UI;
+using MegaCrit.Sts2.addons.mega_text;
 
 
 namespace JiangXiaoMod.Code.Character;
 
-public class JiangXiao : PlaceholderCharacterModel
-// public class JiangXiao : CustomCharacterModel
+// public class JiangXiao : PlaceholderCharacterModel
+public class JiangXiao : CustomCharacterModel
 {
 	public const string CharacterId = "JiangXiao";
 	// 角色代表顏色：極深紅
@@ -39,27 +41,16 @@ public class JiangXiao : PlaceholderCharacterModel
 	// 移除 CustomIconPath 以免觸發 %BurstBack 崩潰
 
 	 public override string CustomTrailPath => "res://JiangXiao/scenes/JiangXiao/card_trail_jiangxiao.tscn";
-	// public override string CustomEnergyCounterPath => "res://JiangXiao/scenes/JiangXiao/jiangxiao_energy_counter.tscn";
-	// public override CustomEnergyCounter? CustomEnergyCounter =>
-	// 	new CustomEnergyCounter(
-	// 		EnergyCounterPaths, 
-	// 		new Color(0.545f, 0f, 0f), // 139, 0, 0 對應的浮點數顏色
-	// 		new Color(0f, 0f, 0f)      // 0, 0, 0
-	// 	)
-	// 	{
-			
-	// 	};
+
+	// public override CustomEnergyCounter? CustomEnergyCounter => 
+	//     new CustomEnergyCounter(EnergyCounterPaths, new Color(0.545f, 0f, 0f), new Color(0.7f, 0.1f, 0.9f));
 	// private string EnergyCounterPaths(int i)
 	// {
-	// 	return $"res://JiangXiao/images/ui/combat/energy_counters/jiangxiao/jiangxiao_orb_layer_{i}.png";
+	//     // 確保 i 對應你資料夾中的 0, 1, 2, 3, 4, 5 層級圖片
+	//     return $"res://JiangXiao/images/ui/combat/energy_counters/jiangxiao/jiangxiao_orb_layer_{i}.png";
 	// }
 
-	public override CustomEnergyCounter? CustomEnergyCounter =>
-		new CustomEnergyCounter(EnergyCounterPaths, new Color(0.545f, 0f, 0f), new Color(0.7f, 0.1f, 0.9f));
-	private string EnergyCounterPaths(int i)
-	{
-		return "res://JiangXiao/images/ui/combat/energy_counters/jiangxiao/jiangxiao_orb_layer_" + i + ".png";
-	}
+	public override string CustomEnergyCounterPath => "res://JiangXiao/scenes/JiangXiao/jiangxiao_energy_counter.tscn";
 
 	// 初始卡組
 	public override IEnumerable<CardModel> StartingDeck => [

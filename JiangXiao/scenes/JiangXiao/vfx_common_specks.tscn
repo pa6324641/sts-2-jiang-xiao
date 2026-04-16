@@ -1,0 +1,48 @@
+[gd_scene load_steps=7 format=3 uid="uid://dwvclv5037ydp"]
+
+[ext_resource type="Texture2D" uid="uid://yk5xrqquubsa" path="res://JiangXiao/images/ui/combat/energy_counters/energy_burst/energy_orb_burst.png" id="1_ecf1v"]
+[ext_resource type="Material" uid="uid://bl6vs7cu08ym7" path="res://JiangXiao/materials/vfx_speck_glow_white.tres" id="1_k1vkv"]
+[ext_resource type="Script" uid="uid://dm7hn1bwr77op" path="res://src/Core/Nodes/Vfx/Utilities/NParticlesContainer.cs" id="3_dujj6"]
+
+[sub_resource type="Curve" id="Curve_k1vkv"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_dujj6"]
+curve = SubResource("Curve_k1vkv")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_gedhy"]
+lifetime_randomness = 0.85
+particle_flag_align_y = true
+particle_flag_disable_z = true
+particle_flag_damping_as_friction = true
+direction = Vector3(-1, 0, 0)
+spread = 180.0
+flatness = 1.0
+initial_velocity_min = 400.0
+initial_velocity_max = 1200.0
+radial_velocity_min = -150.00002
+radial_velocity_max = 249.99997
+gravity = Vector3(0, 0, 0)
+turbulence_enabled = true
+turbulence_noise_strength = 5.0
+turbulence_noise_scale = 10.0
+turbulence_noise_speed = Vector3(0.1, 0.1, 0.1)
+turbulence_noise_speed_random = 1.0
+turbulence_influence_min = 0.65000004
+turbulence_influence_max = 0.85
+turbulence_influence_over_life = SubResource("CurveTexture_dujj6")
+
+[node name="vfx_common_specks" type="GPUParticles2D"]
+self_modulate = Color(1, 0, 0, 1)
+material = ExtResource("1_k1vkv")
+emitting = false
+amount = 6
+texture = ExtResource("1_ecf1v")
+lifetime = 0.8
+one_shot = true
+explosiveness = 1.0
+randomness = 0.5
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_gedhy")
+script = ExtResource("3_dujj6")

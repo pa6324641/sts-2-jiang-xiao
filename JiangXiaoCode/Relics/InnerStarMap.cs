@@ -16,6 +16,8 @@ using JiangXiaoMod.Code.Character;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.Rooms;
+using BaseLib.Extensions;
+using JiangXiaoMod.Code.Extensions;
 
 namespace JiangXiaoMod.Code.Relics;
 
@@ -50,7 +52,10 @@ public sealed class InnerStarMap : CustomRelicModel
     }
 
     private const string VarPoints = "points";
-    protected override string IconBaseName => "inner_star_map";
+    // protected override string IconBaseName => "inner_star_map";
+    protected override string BigIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".BigRelicImagePath();
+    public override string PackedIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".RelicImagePath();
+    protected override string PackedIconOutlinePath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}_outline.png".RelicImagePath();
     public override bool ShouldReceiveCombatHooks => true;
 
     private static readonly FieldInfo? DynamicVarsField = typeof(RelicModel).GetField("_dynamicVars", BindingFlags.NonPublic | BindingFlags.Instance);

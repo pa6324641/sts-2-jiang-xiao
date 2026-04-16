@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cv12v2rf2d56s"]
+
+[ext_resource type="Script" uid="uid://bmvxar7olnpsy" path="res://JiangXiaoCode/Nodes/JiangXiaoModNParticlesContainer.cs" id="1_gl8xd"]
+[ext_resource type="PackedScene" uid="uid://dwvclv5037ydp" path="res://JiangXiao/scenes/JiangXiao/vfx_common_specks.tscn" id="2_ko37c"]
+
+[node name="Jiang_xiao_energy_vfx_front" type="Node2D"]
+script = ExtResource("1_gl8xd")
+
+[node name="vfx_common_specks" parent="." instance=ExtResource("2_ko37c")]

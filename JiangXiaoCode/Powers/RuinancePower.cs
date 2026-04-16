@@ -11,7 +11,9 @@ using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Runs; // 必須引用以獲取全局狀態
+using MegaCrit.Sts2.Core.Runs;
+using BaseLib.Extensions;
+using JiangXiaoMod.Code.Extensions; // 必須引用以獲取全局狀態
 
 namespace JiangXiaoMod.Code.Powers;
 
@@ -22,7 +24,8 @@ public sealed class RuinancePower : CustomPowerModel
     public override PowerType Type => PowerType.Buff;
     // 多人模式建議保持 StackType.None 或按需求調整，但 constructor 必須受控
     public override PowerStackType StackType => PowerStackType.Counter; 
-    public override string CustomPackedIconPath => "ruinance.png"; 
+    public override string CustomPackedIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".PowerImagePath();
+    public override string CustomBigIconPath => CustomPackedIconPath;
 
     // 必須保留無參數構造函數供系統註冊用
     public RuinancePower() : base() { }

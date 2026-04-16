@@ -1,9 +1,9 @@
 {
 	"JIANGXIAOMOD-RUINANCE.title": "忍耐",
-	"JIANGXIAOMOD-RUINANCE.description": "[blue]星技[/blue] 。\n[blue]被動星技[/blue]。\n獲得{Block:diff()}點[gold]格擋[/gold]。\n獲得 [gold]忍耐[/gold] 能力。",
+	"JIANGXIAOMOD-RUINANCE.description": "[blue]星技[/blue] 。\n[blue]被動星技[/blue]。\n獲得{Block:diff()}點[gold]格擋[/gold]。\n獲得{M:diff()}層[gold]忍耐[/gold] 能力。",
 
 	"JIANGXIAOMOD-QING_MANG.title": "青芒",
-	"JIANGXIAOMOD-QING_MANG.description": "[blue]星技[/blue] \n[blue]打擊[/blue]。\n造成{Damage:diff()}點傷害(隨品質提升)。\n減少目標{M}點[gold]力量[/gold](隨品質提升)。\n持有近戰被動時傷害*2； \n目標有[blue]人工製品[/blue]傷害*5。",
+	"JIANGXIAOMOD-QING_MANG.description": "[blue]星技[/blue] \n[blue]打擊[/blue]。\n造成{Damage:diff()}點傷害(隨品質提升)。\n減少目標{M:diff()}點[gold]力量[/gold](隨品質提升)。\n持有近戰被動時傷害*2； \n目標有[blue]人工製品[/blue]傷害*5。",
 
 	"JIANGXIAOMOD-STRIKE_JIANG_XIAO.title": "打擊",
     "JIANGXIAOMOD-STRIKE_JIANG_XIAO.description": "[blue]星技[/blue]。\n造成{Damage:diff()}點傷害。",
@@ -13,6 +13,16 @@
 
 	"JIANGXIAOMOD-BLESSING.title": "祝福",
     "JIANGXIAOMOD-BLESSING.description": "[blue]星技[/blue]。\n治癒一名隊友{HealAmount:diff()}點生命 。",
+	"JIANGXIAOMOD-BLESSING_ENEMY_TOKEN.title": "祝福:敵人",
+  	"JIANGXIAOMOD-BLESSING_ENEMY_TOKEN.description": "治癒一名敵人{HealAmount:diff()}點生命，並暈眩",
+	"JIANGXIAOMOD-BLESSING_ALLY_TOKEN.title": "祝福:隊友",
+  	"JIANGXIAOMOD-BLESSING_ALLY_TOKEN.description": "治癒一名隊友{HealAmount:diff()}點生命",
+	"JIANGXIAOMOD-BLESSING_ALL_ALLY_TOKEN.title": "祝福:全隊友",
+  	"JIANGXIAOMOD-BLESSING_ALL_ALLY_TOKEN.description": "治癒全體隊友{HealAmount:diff()}點生命",
+	"JIANGXIAOMOD-BLESSING_ALL_ENEMY_TOKEN.title": "祝福:全敵人",
+  	"JIANGXIAOMOD-BLESSING_ALL_ENEMY_TOKEN.description": "治癒全體敵人{HealAmount:diff()}點生命，並暈眩",
+	"JIANGXIAOMOD-BLESSING_SELF_TOKEN.title": "祝福:自身",
+  	"JIANGXIAOMOD-BLESSING_SELF_TOKEN.description": "治癒自身{HealAmount:diff()}點生命",
 
 	"JIANGXIAOMOD-CHENG_YIN.description": "[blue]星技[/blue]。\n為友方施加[gold]承印[/gold] 。\n受傷時獲得持續治癒，指引鐘鈴的醫療光線。",
   	"JIANGXIAOMOD-CHENG_YIN.title": "承印",
@@ -53,7 +63,7 @@
 	"JIANGXIAOMOD-REST_TOKEN.title": "休息",
 
 	"JIANGXIAOMOD-SECONDARY_FACE.title": "副相",
-	"JIANGXIAOMOD-SECONDARY_FACE.description": "選擇手牌中1張牌，將{M}張複本加入手牌。複本耗能變為0並具有[gold]消耗[/gold] 。",
+	"JIANGXIAOMOD-SECONDARY_FACE.description": "選擇手牌中1張牌，將{M:diff()}張複本加入手牌。複本耗能變為0並具有[gold]消耗[/gold] 。",
 
 	"JIANGXIAOMOD-TEAR_OF_SORROW.title": "傷淚",
   	"JIANGXIAOMOD-TEAR_OF_SORROW.description": "[blue]星技[/blue]。\n給予所有單位{M:diff()}層[gold]悲傷之淚[/gold]。\n(星技品質為[red]白金[/red]以上時，改為僅給予全體敵人)。",
@@ -62,7 +72,7 @@
 	"JIANGXIAOMOD-CLEAN_TEARS.description": "[blue]星技[/blue]。\n清除自身和隊友的 [blue]狀態[/blue]&[blue]詛咒[/blue] 牌，從抽牌堆/手牌/棄牌堆中各{M:diff()}張。",
 
 	"JIANGXIAOMOD-UNARMED_STRIKE.title": "徒手打擊",
-  	"JIANGXIAOMOD-UNARMED_STRIKE.description": "造成{Damage:diff()}點傷害，抽{M}張牌。\n(受[gold]徒手格鬥等級[/gold]強化)。",
+  	"JIANGXIAOMOD-UNARMED_STRIKE.description": "造成{Damage:diff()}點傷害，抽{M:diff()}張牌。\n(受[gold]徒手格鬥等級[/gold]強化)。",
 
 	"JIANGXIAOMOD-XIA_BLADE_STYLE1.title": "夏家刀法第一式-橫刀奪愛",
   	"JIANGXIAOMOD-XIA_BLADE_STYLE1.description": "造成{Damage:diff()}點傷害、{Block:diff()}點[gold]格擋[/gold]。\n(受[gold]夏家刀法等級[/gold]強化)。",
@@ -77,7 +87,7 @@
   	"JIANGXIAOMOD-XIA_BLADE_STYLE_TRUE.description": "成{Damage:diff()}點傷害、{Block:diff()}點[gold]格擋[/gold]。\n(受[gold]夏家刀法等級[/gold]強化)。\n擁有夏家刀法第一~三式時傷害*4",
 
 	"JIANGXIAOMOD-BASIC_ARROW.title": "基礎箭矢",
-  	"JIANGXIAOMOD-BASIC_ARROW.description": "造成{Damage:diff()}點傷害。\n抽取{M}張帶有[blue]弓箭精通[/blue]的牌。\n(受[gold]弓箭精通等級[/gold]強化)。",
+  	"JIANGXIAOMOD-BASIC_ARROW.description": "造成{Damage:diff()}點傷害。\n抽取{M:diff()}張帶有[blue]弓箭精通[/blue]的牌。\n(受[gold]弓箭精通等級[/gold]強化)。",
 
 	"JIANGXIAOMOD-STAR_POWER_ARROW.title": "星力箭矢",
   	"JIANGXIAOMOD-STAR_POWER_ARROW.description": "造成{Damage:diff()}點傷害。\n(受[gold]弓箭精通等級[/gold]&[gold]星力等級[/gold]強化)。",
