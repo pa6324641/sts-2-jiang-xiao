@@ -61,29 +61,34 @@ public sealed class StarPowerLevel : CustomRelicModel
     public int GetLevel(Player? specificPlayer = null)
     {
         // 優先順序：傳入參數 > 遺物持有者 > 戰局首位玩家(預覽用)
-        Player? target = specificPlayer;
+        Player? player = specificPlayer;
         
-        if (target == null && IsMutable)
+        if (player == null && IsMutable)
         {
             // 在戰鬥或非圖鑑狀態下，嘗試獲取 Owner
-            try { target = Owner; } catch { }
+            try { player = Owner; } catch { }
         }
 
         // 圖鑑/預覽邏輯：若仍無對象，則取當前運作狀態中的第一個玩家
-        target ??= RunManager.Instance?.DebugOnlyGetState()?.Players.FirstOrDefault();
+        player ??= RunManager.Instance?.DebugOnlyGetState()?.Players.FirstOrDefault();
         
-        if (target == null) return 1;
+        if (player == null) return 1;
 
         // 從目標玩家的遺物中尋找核心遺物 InnerStarMap
-        var mainRelic = target.Relics.OfType<InnerStarMap>().FirstOrDefault();
-        int points = mainRelic?.JiangXiaoMod_SkillPoints ?? 0;
+        // 原本需要寫 if (null) 的邏輯現在簡化為：
+        var mainRelic = JiangXiaoUtils.GetStarMap(player);
 
-        // 根據點數判定等級 (1-6)
-        if (points < 5000) return 1;
-        if (points < 20000) return 2;
-        if (points < 30000) return 3;
-        if (points < 40000) return 4;
-        if (points < 45000) return 5;
+        if (mainRelic != null)
+        {
+            // 直接訪問介面定義的屬性，不管是基礎版還是升級版都通用
+            int points = mainRelic.JiangXiaoMod_SkillPoints;
+            // 根據點數判定等級 (1-6)
+            if (points < 5000) return 1;
+            if (points < 20000) return 2;
+            if (points < 30000) return 3;
+            if (points < 40000) return 4;
+            if (points < 45000) return 5;
+        }
         return 6;
     }
 

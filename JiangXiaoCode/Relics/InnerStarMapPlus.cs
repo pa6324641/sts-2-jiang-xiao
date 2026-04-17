@@ -22,7 +22,7 @@ using JiangXiaoMod.Code.Extensions;
 namespace JiangXiaoMod.Code.Relics;
 
 [Pool(typeof(JiangXiaoRelicPool))]
-public sealed class InnerStarMapPlus : CustomRelicModel
+public sealed class InnerStarMapPlus : CustomRelicModel, IInnerStarMap
 {
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

@@ -14,6 +14,8 @@ using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using BaseLib.Extensions;
 using JiangXiaoMod.Code.Extensions;
+using MegaCrit.Sts2.Core.Map;
+using System.Drawing;
 
 namespace JiangXiaoMod.Code.Relics;
 
@@ -48,9 +50,20 @@ public sealed class StarSkillQuality : CustomRelicModel
         
         if (player == null) return 0;
 
-        // 使用 OfType<T> 效率更高且代碼更簡潔
-        var mainRelic = player.Relics.OfType<InnerStarMap>().FirstOrDefault();
-        return mainRelic?.JiangXiaoMod_SkillPoints ?? 0;
+        // 從目標玩家的遺物中尋找核心遺物 InnerStarMap
+        // 原本需要寫 if (null) 的邏輯現在簡化為：
+        var mainRelic = JiangXiaoUtils.GetStarMap(player);
+
+        if (mainRelic != null)
+        {
+            // 直接訪問介面定義的屬性，不管是基礎版還是升級版都通用
+            int points = mainRelic.JiangXiaoMod_SkillPoints;
+            return points;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     public QualityRank GetRank()

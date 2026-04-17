@@ -15,7 +15,7 @@ using JiangXiaoMod.Code.Character;
 namespace JiangXiaoMod.Code.Relics;
 
 [Pool(typeof(JiangXiaoRelicPool))]
-public sealed class InnerStarMap : CustomRelicModel
+public sealed class InnerStarMap : CustomRelicModel, IInnerStarMap
 {
     public override RelicRarity Rarity => RelicRarity.Starter;
 
