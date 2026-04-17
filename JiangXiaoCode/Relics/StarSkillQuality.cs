@@ -12,6 +12,8 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using JiangXiaoMod.Code.Character;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Entities.Relics;
+using BaseLib.Extensions;
+using JiangXiaoMod.Code.Extensions;
 
 namespace JiangXiaoMod.Code.Relics;
 
@@ -19,7 +21,7 @@ namespace JiangXiaoMod.Code.Relics;
 public sealed class StarSkillQuality : CustomRelicModel
 {
     public override RelicRarity Rarity => RelicRarity.Starter;
-    protected override string IconBaseName => "star_skill_quality";
+    // protected override string IconBaseName => "star_skill_quality";
 
     // 這裡定義的 Rank 順序與你的點數判定邏輯一致
     public enum QualityRank { Bronze = 1, Silver = 2, Gold = 3, Platinum = 4, Diamond = 5, CandleMoon = 6, ScorchingSun = 7 }
@@ -30,6 +32,10 @@ public sealed class StarSkillQuality : CustomRelicModel
     private static readonly FieldInfo? DynamicVarsField = typeof(RelicModel).GetField("_dynamicVars", BindingFlags.NonPublic | BindingFlags.Instance);
 
     public int SkillRank => (int)GetRank();
+
+    protected override string BigIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".BigRelicImagePath();
+    public override string PackedIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".RelicImagePath();
+    protected override string PackedIconOutlinePath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}_outline.png".RelicImagePath();
 
     /// <summary>
     /// 安全地獲取技能點數 (相容圖鑑、讀檔預覽、多人模式)

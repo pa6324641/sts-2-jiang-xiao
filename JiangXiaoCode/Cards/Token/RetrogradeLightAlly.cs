@@ -19,7 +19,7 @@ public class RetrogradeLightAlly : JiangXiaoCardModel
 
     // [Fix CS1061] TargetType 不含 Ally。STS2 中單體友方通常使用 TargetType.Self 
     // 若要指定隊友，建議設為 Self 並在 OnPlay 內邏輯處理，或確認是否有 SingleAlly 
-    public RetrogradeLightAlly() : base(0, CardType.Skill, CardRarity.Basic, TargetType.Self, false)
+    public RetrogradeLightAlly() : base(0, CardType.Skill, CardRarity.Basic, TargetType.AnyAlly, false)
     {
     }
     public override HashSet<CardKeyword> CanonicalKeywords =>

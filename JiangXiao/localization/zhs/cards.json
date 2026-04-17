@@ -12,7 +12,7 @@
     "JIANGXIAOMOD-DEFEND_JIANG_XIAO.description": "[blue]星技[/blue]。\n獲得{Block:diff()}[gold]格擋[/gold]。",
 
 	"JIANGXIAOMOD-BLESSING.title": "祝福",
-    "JIANGXIAOMOD-BLESSING.description": "[blue]星技[/blue]。\n治癒一名隊友{HealAmount:diff()}點生命 。",
+    "JIANGXIAOMOD-BLESSING.description": "[blue]星技[/blue]。\n治癒{HealAmount:diff()}點生命 。",
 	"JIANGXIAOMOD-BLESSING_ENEMY_TOKEN.title": "祝福:敵人",
   	"JIANGXIAOMOD-BLESSING_ENEMY_TOKEN.description": "治癒一名敵人{HealAmount:diff()}點生命，並暈眩",
 	"JIANGXIAOMOD-BLESSING_ALLY_TOKEN.title": "祝福:隊友",

@@ -20,7 +20,7 @@ public class SpaceGap : JiangXiaoCardModel
 {
     public const string CardId = "SpaceGap";
 
-    public SpaceGap() : base(5, CardType.Skill, CardRarity.Rare, TargetType.Self)
+    public SpaceGap() : base(3, CardType.Skill, CardRarity.Rare, TargetType.Self)
     {
     }
 

@@ -31,11 +31,6 @@ public sealed class RuinancePower : CustomPowerModel
     public RuinancePower() : base() { }
     
     // 用於戰鬥中實例化的構造函數
-    public RuinancePower(int amount) : base()
-    {
-        this.Amount = amount;
-    }
-
     public override decimal ModifyDamageAdditive(Creature? target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)
     {
         if (Owner != null && target == Owner && amount > 0)

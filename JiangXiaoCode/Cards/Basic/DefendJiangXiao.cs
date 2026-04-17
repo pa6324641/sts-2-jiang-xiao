@@ -16,11 +16,12 @@ using JiangXiaoMod.Code.Keywords;
 using BaseLib.Utils;
 using JiangXiaoMod.Code.Character;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using JiangXiaoMod.Code.Cards.CardModels;
 
 namespace JiangXiaoMod.Code.Cards.Basic;
 
 [Pool(typeof(JiangXiaoCardPool))]
-public sealed class DefendJiangXiao : CustomCardModel
+public sealed class DefendJiangXiao : JiangXiaoCardModel
 {
     private const decimal BaseBlock = 5m;
     private const decimal UpgradeBlock = 3m;
@@ -28,18 +29,22 @@ public sealed class DefendJiangXiao : CustomCardModel
 
     public DefendJiangXiao() : base(1, CardType.Skill, CardRarity.Basic, TargetType.Self)
     {
+        JJTag(CardTag.Defend);
+        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        JJStaticTip(StaticHoverTip.Block);
+        JJBlock(BaseBlock,ValueProp.Move);
     }
 
     // STS2 屬性：標記此卡會獲得格擋，利於 AI 識別與 UI 顯示
-    public override bool GainsBlock => true;
+    // public override bool GainsBlock => true;
 
-    protected override HashSet<CardTag> CanonicalTags => [CardTag.Defend];
+    // protected override HashSet<CardTag> CanonicalTags => [CardTag.Defend];
     
-    // 必須包含星技關鍵字
-    public override HashSet<CardKeyword> CanonicalKeywords => [JiangXiaoModKeywords.Star];
+    // // 必須包含星技關鍵字
+    // public override HashSet<CardKeyword> CanonicalKeywords => [JiangXiaoModKeywords.Star];
 
-    // 初始化基礎格擋變量
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar(BaseBlock, ValueProp.Move)];
+    // // 初始化基礎格擋變量
+    // protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar(BaseBlock, ValueProp.Move)];
 
     public override string PortraitPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".CardImagePath();
 

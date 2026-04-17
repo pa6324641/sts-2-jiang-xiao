@@ -1,23 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Reflection;
 using BaseLib.Abstracts;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Relics;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Runs;
-using MegaCrit.Sts2.Core.Nodes.Rooms; // 建議檢查命名空間是否為 Nodes.Rooms
 using MegaCrit.Sts2.Core.Combat;
-using MegaCrit.Sts2.Core.Entities.Players;
-using JiangXiaoMod.Code.Character;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.Rooms;
 using BaseLib.Extensions;
 using JiangXiaoMod.Code.Extensions;
+using JiangXiaoMod.Code.Character;
 
 namespace JiangXiaoMod.Code.Relics;
 
@@ -34,17 +27,16 @@ public sealed class InnerStarMap : CustomRelicModel
         get => _skillPoints; 
         set 
         {
-            if (_skillPoints == value) return; // 數值沒變就跳過，減少反射開銷
+            if (_skillPoints == value) return;
             _skillPoints = value;
 
-            // [優化 1]：透過 setter 自動觸發連動刷新，確保數據一致性
-            var player = Owner ?? RunManager.Instance?.DebugOnlyGetState()?.Players.FirstOrDefault();
-            if (player != null)
+            // [安全修正]：根據反編譯源碼，增加 IsMutable 檢查
+            // 避免在遊戲初始化藍圖時因觸發 Owner 邏輯而崩潰
+            if (base.IsMutable && Owner != null)
             {
-                // 使用 OfType<T> 效能優於 Is / As 判斷
+                var player = Owner;
                 player.Relics.OfType<StarSkillQuality>().FirstOrDefault()?.RefreshDisplay();
                 player.Relics.OfType<StarPowerLevel>().FirstOrDefault()?.RefreshDisplay();
-                // 如果有 BasicArts 也需要連動，可以在此加入
                 player.Relics.OfType<BasicArts>().FirstOrDefault()?.RefreshDisplay();
             }
             RefreshDynamicText();
@@ -52,7 +44,6 @@ public sealed class InnerStarMap : CustomRelicModel
     }
 
     private const string VarPoints = "points";
-    // protected override string IconBaseName => "inner_star_map";
     protected override string BigIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".BigRelicImagePath();
     public override string PackedIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".RelicImagePath();
     protected override string PackedIconOutlinePath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}_outline.png".RelicImagePath();
@@ -65,14 +56,16 @@ public sealed class InnerStarMap : CustomRelicModel
         DynamicVarsField?.SetValue(this, null);
     }
 
-    /// <summary>
-    /// 提供給外部（如 Utils）使用的靜態獲取方法
-    /// </summary>
     public static int GetSkillPoints(IRunState? runState)
     {
         var player = runState?.Players.FirstOrDefault();
-        var relic = player?.Relics.OfType<InnerStarMap>().FirstOrDefault();
-        return relic?.JiangXiaoMod_SkillPoints ?? 0;
+        // [修正]：這裡應能獲取基礎版或升級版。利用 OfType<RelicModel> 並檢查 ID 較安全
+        var relic = player?.Relics.FirstOrDefault(r => r.Id.Entry.Contains("INNER_STAR_MAP"));
+        
+        // 利用反射或轉型獲取點數，此處簡化處理
+        if (relic is InnerStarMap normal) return normal.JiangXiaoMod_SkillPoints;
+        if (relic is InnerStarMapPlus plus) return plus.JiangXiaoMod_SkillPoints;
+        return 0;
     }
 
     public override Task AfterCombatVictory(CombatRoom room)
@@ -84,16 +77,12 @@ public sealed class InnerStarMap : CustomRelicModel
             else if (room.RoomType == RoomType.Elite) gain = 2500;
         }
 
-        // [優化 2]：利用歷史記錄系統同步變動 (多人模式關鍵)
         if (Owner?.Creature?.CombatState != null)
         {
             CombatManager.Instance.History.StarsModified(Owner.Creature.CombatState, gain, Owner);
         }
 
-        // [優化 3]： setter 內部已經包含了刷新連動遺物的邏輯
-        // 此處只需單純修改數值即可，不需要再寫 redundant 的手動刷新代碼
         JiangXiaoMod_SkillPoints += gain;
-
         Flash(); 
         return Task.CompletedTask;
     }
@@ -106,15 +95,14 @@ public sealed class InnerStarMap : CustomRelicModel
         }
     }
 
+    // [核心修正]：升級邏輯
     public override RelicModel? GetUpgradeReplacement()
     {
-        var upgraded = ModelDb.Relic<InnerStarMapPlus>();
+        // 1. 將當前實例的點數存入 InnerStarMapPlus 的靜態緩存
+        InnerStarMapPlus._transferPointsBuffer = this.JiangXiaoMod_SkillPoints;
         
-        if (upgraded is InnerStarMapPlus plusRelic)
-        {
-            plusRelic.JiangXiaoMod_SkillPoints = this.JiangXiaoMod_SkillPoints;
-        }
-        
-        return upgraded;
+        // 2. 僅傳回升級版的藍圖範本
+        // 系統會自動移除此遺物，並根據此藍圖建立新的 InnerStarMapPlus 實例
+        return ModelDb.Relic<InnerStarMapPlus>();
     }
 }

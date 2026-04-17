@@ -74,7 +74,6 @@ public sealed class Ruinance : CustomCardModel
     }
 
     // --- 生命週期掛鉤 ---
-
     public override Task BeforeCombatStart()
     {
         UpdateStatsBasedOnRank();

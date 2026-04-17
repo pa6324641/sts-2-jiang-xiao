@@ -14,6 +14,8 @@ using MegaCrit.Sts2.Core.Combat;
 using JiangXiaoMod.Code.Character;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Entities.Relics;
+using BaseLib.Extensions;
+using JiangXiaoMod.Code.Extensions;
 
 namespace JiangXiaoMod.Code.Relics;
 
@@ -24,8 +26,12 @@ public sealed class StarPowerLevel : CustomRelicModel
     private const string VarLevel = "level";
     private const string VarEnergy = "energy";
 
-    protected override string IconBaseName => "star_power_level";
+    // protected override string IconBaseName => "star_power_level";
     private static readonly FieldInfo? DynamicVarsField = typeof(RelicModel).GetField("_dynamicVars", BindingFlags.NonPublic | BindingFlags.Instance);
+
+    protected override string BigIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".BigRelicImagePath();
+    public override string PackedIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".RelicImagePath();
+    protected override string PackedIconOutlinePath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}_outline.png".RelicImagePath();
 
     /// <summary>
     /// [STS2_API] 正確的能量修正勾子

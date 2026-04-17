@@ -42,6 +42,7 @@ public class AbundantStar : JiangXiaoCardModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips => [
         HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star),
         HoverTipFactory.Static(StaticHoverTip.Energy)
+        
     ];
 
     /// <summary>

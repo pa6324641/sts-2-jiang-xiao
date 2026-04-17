@@ -12,7 +12,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using BaseLib.Utils;
 using JiangXiaoMod.Code.Character;
 
-namespace JiangXiaoMod.Code.Cards.Rare;
+namespace JiangXiaoMod.Code.Cards.Uncommon;
 
 [Pool(typeof(JiangXiaoCardPool))]
 public class RetrogradeLight : JiangXiaoCardModel

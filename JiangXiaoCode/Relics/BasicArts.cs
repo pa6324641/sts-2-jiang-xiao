@@ -4,8 +4,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BaseLib.Abstracts;
+using BaseLib.Extensions;
 using BaseLib.Utils;
 using JiangXiaoMod.Code.Character;
+using JiangXiaoMod.Code.Extensions;
 using JiangXiaoMod.Code.Keywords;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Context;
@@ -23,7 +25,7 @@ namespace JiangXiaoMod.Code.Relics;
 public sealed class BasicArts : CustomRelicModel
 {
     public override RelicRarity Rarity => RelicRarity.Starter;
-    protected override string IconBaseName => "basic_arts";
+    // protected override string IconBaseName => "basic_arts";
 
     // --- 存檔字段定義 (使用簡化 Setter) ---
 
@@ -49,6 +51,9 @@ public sealed class BasicArts : CustomRelicModel
 
     private static readonly FieldInfo? DynamicVarsField = typeof(RelicModel).GetField("_dynamicVars", BindingFlags.NonPublic | BindingFlags.Instance);
     public override bool ShouldReceiveCombatHooks => true;
+    protected override string BigIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".BigRelicImagePath();
+    public override string PackedIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".RelicImagePath();
+    protected override string PackedIconOutlinePath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}_outline.png".RelicImagePath();
 
     /// <summary>
     /// 計算等級：10點一級，最高7級
