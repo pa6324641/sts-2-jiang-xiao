@@ -1,85 +1,83 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Godot;
-using BaseLib.Abstracts;
-using MegaCrit.Sts2.Core.Models;
+using BaseLib.Utils;
+using JiangXiaoMod.Code.Cards.CardModels;
+using JiangXiaoMod.Code.Character;
+using JiangXiaoMod.Code.Keywords;
+using JiangXiaoMod.Code.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
-using MegaCrit.Sts2.Core.Combat;
-using JiangXiaoMod.Code.Powers;
-using JiangXiaoMod.Code.Relics;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.HoverTips;
-using JiangXiaoMod.Code.Keywords;
-using MegaCrit.Sts2.Core.Models.Powers;
-using MegaCrit.Sts2.Core.Runs;
-using BaseLib.Utils;
-using JiangXiaoMod.Code.Character;
-using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace JiangXiaoMod.Code.Cards.Rare
 {
     [Pool(typeof(JiangXiaoCardPool))]
-    public sealed class ChengYin() : CustomCardModel(1, CardType.Power, CardRarity.Rare, TargetType.AllAllies)
+    public sealed class ChengYin : JiangXiaoCardModel
     {
-        private const string _mKey = "M";
-        
-        protected override IEnumerable<DynamicVar> CanonicalVars => [ new(_mKey, 2m) ];
-        
-        protected override IEnumerable<IHoverTip> ExtraHoverTips => [
-            HoverTipFactory.FromPower<RegenPower>(),
-            HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star),
-            HoverTipFactory.FromPower<ChengYinPower>()
-        ];
+        public const string CardId = "JIANGXIAOMOD-CHENGYIN";
+        private const string mKey = "M";
 
-        public override Task BeforeCombatStart()
+        public ChengYin() : base(1, CardType.Power, CardRarity.Rare, TargetType.Self)
         {
-            UpdateStatsBasedOnRank();
-            return base.BeforeCombatStart();
+            // [STS2_Optimization] JJKeywordAndTip 會自動處理關鍵字與懸停提示
+            JJKeywordAndTip(JiangXiaoModKeywords.Star);
+            
+            // 註冊能力提示
+            JJPowerTip<ChengYinPower>();
+            JJPowerTip<RegenPower>();
+            
+            // 初始化自定義變量 M
+            JJCustomVar(mKey, 2m); 
         }
 
-        public int GetQualityRank()
+        /// <summary>
+        /// 根據星技品質等級動態調整數值。
+        /// [STS2_API] 當遺物狀態改變或進入戰鬥時，基類會觸發此邏輯。
+        /// </summary>
+        protected override void ApplyRankLogic(Player? player, int skillRank)
         {
-            try {
-                // [核心修正] 優先使用 Owner。若在圖鑑中(Owner為null)，則從 RunManager 獲取狀態。
-                var player = Owner ?? RunManager.Instance.DebugOnlyGetState()?.Players.FirstOrDefault();
-                var relic = player?.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-                return relic?.SkillRank ?? 1;
+            // 基礎 2 層，每提升一級品質 +1。
+            // 例如：1級時為2層，2級時為3層。
+            decimal finalValue = 2m + (skillRank - 1);
+            
+            // 更新 DynamicVar，這會直接影響卡牌描述中的 {M} 顯示
+            if (DynamicVars.ContainsKey(mKey))
+            {
+                DynamicVars[mKey].BaseValue = finalValue;
             }
-            catch { return 1; }
-        }
-
-        public void UpdateStatsBasedOnRank()
-        {
-            int rank = GetQualityRank();
-            // 基礎 3 層，每級品質 +1
-            decimal finalRegenValue = 3m + (rank - 1);
-            DynamicVars[_mKey].BaseValue = finalRegenValue;
         }
 
         protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
         {
-            // 1. 強制更新當前數值
+            // 確保在出牌瞬間數值是根據當前狀態計算的
             UpdateStatsBasedOnRank();
-            decimal regenAmount = DynamicVars[_mKey].BaseValue;
+            decimal amount = DynamicVars[mKey].BaseValue;
 
-            // 2. [核心修正] 獲取戰鬥狀態中的所有盟友
-            // 在 STS2 中，CombatState.Allies 包含了所有友方單位（包含玩家自己與寵物/召喚物）
             var combat = this.CombatState;
-            if (combat != null)
-            {
-                // [STS2_API] 使用 PowerCmd.Apply 批量對所有盟友施加能力
-                // 傳入 combat.Allies 作為目標集合
-                await PowerCmd.Apply<ChengYinPower>(
-                    combat.Allies, 
-                    regenAmount, 
-                    Owner.Creature, 
-                    this
-                );
-            }
+            if (combat == null) return;
+
+            // 1. 執行卡牌播放視覺效果 (如有需要可加入 VFX 指令)
+
+            // 2. [STS2_API] 批量施加專屬能力給所有盟友 (包含玩家)
+            // PowerCmd.Apply 會自動處理 Task 佇列，確保動畫依序播放
+            await PowerCmd.Apply<ChengYinPower>(
+                combat.Allies, 
+                amount, 
+                Owner.Creature, 
+                this
+            );
+
+            // 3. 同時施加標準的「再生」能力
+            await PowerCmd.Apply<RegenPower>(
+                combat.Allies, 
+                amount, 
+                Owner.Creature, 
+                this
+            );
         }
     }
 }

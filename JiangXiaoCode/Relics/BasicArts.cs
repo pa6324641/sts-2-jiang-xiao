@@ -12,6 +12,7 @@ using JiangXiaoMod.Code.Keywords;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -125,5 +126,10 @@ public sealed class BasicArts : CustomRelicModel
     {
         RefreshDisplay();
         return Task.CompletedTask;
+    }
+
+    internal int GetArtRank(Player? player, BasicArtType type)
+    {
+        throw new NotImplementedException();
     }
 }

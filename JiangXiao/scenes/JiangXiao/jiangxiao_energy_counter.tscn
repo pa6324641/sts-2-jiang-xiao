@@ -41,7 +41,7 @@ script = ExtResource("1_1a1n3")
 metadata/_edit_lock_ = true
 metadata/_edit_group_ = true
 
-[node name="BurstBack" parent="." instance=ExtResource("2_qvhm7")]
+[node name="EnergyVfxBack" parent="." instance=ExtResource("2_qvhm7")]
 unique_name_in_owner = true
 position = Vector2(64, 64)
 speed_scale = 0.5
@@ -132,7 +132,7 @@ texture = ExtResource("6_1gb0p")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BurstFront" parent="." instance=ExtResource("9_8qbw5")]
+[node name="EnergyVfxFront" parent="." instance=ExtResource("9_8qbw5")]
 unique_name_in_owner = true
 position = Vector2(64, 64)
 amount = 1

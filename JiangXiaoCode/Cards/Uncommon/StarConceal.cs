@@ -13,6 +13,8 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using JiangXiaoMod.Code.Keywords;
+using MegaCrit.Sts2.Core.HoverTips;
 
 namespace JiangXiaoMod.Code.Cards.Uncommon;
 
@@ -23,6 +25,8 @@ public class StarConceal : JiangXiaoCardModel
 
     public StarConceal() : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.AnyAlly)
     {
+        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        JJStaticTip(StaticHoverTip.Energy);
     }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [
@@ -30,14 +34,14 @@ public class StarConceal : JiangXiaoCardModel
     ];
 
     // [STS2_Critical] 修正：Owner 是 Creature，必須透過 .Player 訪問遺物
-    public void UpdateStatsBasedOnRank()
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
         var relic = Owner.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-        int rank = relic?.SkillRank ?? 1;
+        // int rank = relic?.SkillRank ?? 1;
 
         decimal energyAmount = 2m;
-        if (rank >= 6) energyAmount = 6m;
-        else if (rank >= 4) energyAmount = 4m;
+        if (skillRank >= 6) energyAmount = 6m;
+        else if (skillRank >= 4) energyAmount = 4m;
 
         DynamicVars["E"].BaseValue = energyAmount;
     }

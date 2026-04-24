@@ -12,85 +12,72 @@ using MegaCrit.Sts2.Core.ValueProps;
 using BaseLib.Utils;
 using JiangXiaoMod.Code.Character;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using JiangXiaoMod.Code.Cards.CardModels;
+using MegaCrit.Sts2.Core.Entities.Players;
 
 namespace JiangXiaoMod.Code.Cards.Rare;
 
 /// <summary>
 /// 夏家刀法第三式-斜刀奪愛
 /// 3費 攻擊 稀有
-/// 效果：獲得格擋並造成傷害，數值隨 BladeRank 提升（每級+3）。
+/// 效果：獲得格擋並造成傷害，數值隨 BladeRank 提升。
 /// </summary>
-
 [Pool(typeof(JiangXiaoCardPool))]
-public class XiaBladeStyle3 : CustomCardModel
+public sealed class XiaBladeStyle3 : JiangXiaoCardModel
 {
-    // [STS2_API] 調用基類構造函數：3費, 攻擊牌, 稀有(Rare), 目標為任一敵人
+    public const string CardId = "JIANGXIAOMOD-XIA-BLADE-3";
+
+    // 定義常量以便於維護
+    private const decimal BaseVal = 3m;
+    private const decimal RankBonus = 3m;
+    private const decimal UpgradeBonus = 5m; // 升級後基礎值提升
+
     public XiaBladeStyle3() : base(3, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy)
     {
-    }
-
-    // 設置關鍵字：使用刀法關鍵字 JiangXiaoModBLADE
-    public override HashSet<CardKeyword> CanonicalKeywords => [JiangXiaoModKeywords.JiangXiaoModBLADE];
-
-    /// <summary>
-    /// 定義卡片變量：Damage (基礎 3) 與 Block (基礎 3)
-    /// </summary>
-    protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new DamageVar(3m, ValueProp.Move), 
-        new BlockVar(3m, ValueProp.Move)  
-    ];
-
-    /// <summary>
-    /// 在戰鬥開始前或數值刷新時調用，確保與刀法等級同步
-    /// </summary>
-    public override Task BeforeCombatStart()
-    {
-        UpdateStatsBasedOnRank();
-        return base.BeforeCombatStart();
+        JJKeywordAndTip(JiangXiaoModKeywords.JiangXiaoModBLADE);
+        JJDamage(BaseVal, ValueProp.Move);
+        JJBlock(BaseVal, ValueProp.Move);
     }
 
     /// <summary>
-    /// 核心成長邏輯：根據「刀法等級 (BladeRank)」動態計算
+    /// 核心成長邏輯：由基類 JiangXiaoCardModel 自動在描述生成時或戰鬥中調用 [cite: 9]
     /// </summary>
-    private void UpdateStatsBasedOnRank()
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
-        // 調用 JiangXiaoUtils 獲取當前刀法等級
-        int rank = JiangXiaoUtils.GetBladeRank(Owner);
+        // 獲取當前刀法等級 
+        int rank = JiangXiaoUtils.GetBladeRank(player);
 
-        // [邏輯] 傷害：基礎 3 + 每級 3；格擋：基礎 3 + 每級 3
-        // 計算範例：Rank 0 = 3/3, Rank 1 = 6/6, Rank 2 = 9/9
-        DynamicVars.Damage.BaseValue = 3m + (rank * 3m);
-        DynamicVars.Block.BaseValue = 3m + (rank * 3m);
+        // 計算邏輯：(基礎值 + 升級值) + (等級 * 成長係數)
+        // 這樣可以確保升級後的基礎提升與等級成長並存
+        decimal currentBase = IsUpgraded ? (BaseVal + UpgradeBonus) : BaseVal;
+        
+        DynamicVars.Damage.BaseValue = currentBase + (rank * RankBonus);
+        DynamicVars.Block.BaseValue = currentBase + (rank * RankBonus);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        // 1. 打出時即時刷新數值，確保反映最新的刀法等級
-        UpdateStatsBasedOnRank();
+        // 基類會在 OnPlay 前自動調用 UpdateStatsBasedOnRank，此處可專注於動作執行
         
-        // 安全檢查
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
         if (Owner?.Creature == null) return;
 
-        // 2. 執行格擋動作 (目標為玩家自己)
+        // 1. 執行格擋動作 (目標為玩家自己)
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
-        // 3. 執行攻擊動作 (目標為選中的敵人)
+        // 2. 執行攻擊動作
+        // 注意：DamageCmd.Attack 通常接受 DynamicVar 以便計算 PreviewValue [cite: 3]
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
             .Targeting(cardPlay.Target)
-            .WithHitFx("vfx/vfx_attack_slash") // 使用刀法揮砍特效
+            .WithHitFx("vfx/vfx_attack_slash") 
             .Execute(choiceContext);
     }
 
-    /// <summary>
-    /// 升級效果處理
-    /// </summary>
     protected override void OnUpgrade()
     {
-        // 升級建議：提升基礎數值。考慮到稀有卡與 3 費成本，基礎值各提升 +4
-        DynamicVars.Damage.UpgradeValueBy(3m);
-        DynamicVars.Block.UpgradeValueBy(3m);
-        EnergyCost.UpgradeBy(-3);
+        // 基礎傷害與格擋由 3 -> 8，且依然享受等級成長。
+        EnergyCost.UpgradeBy(-3); 
+        // 數值更新會在 ApplyRankLogic 中根據 IsUpgraded 自動處理
     }
 }

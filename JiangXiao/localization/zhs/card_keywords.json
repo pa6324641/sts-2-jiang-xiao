@@ -24,5 +24,8 @@
   "JIANGXIAOMOD-JIANGXIAOMODHALBERD.description": "代表天方戟精通的技巧。每打出一張此類卡片，會增加天方戟精通點數。",
 
   "JIANGXIAOMOD-JIANGXIAOMODCOMBATKNIFE.title": "格鬥刀精通",
-  "JIANGXIAOMOD-JIANGXIAOMODCOMBATKNIFE.description": "代表格鬥刀精通的技巧。每打出一張此類卡片，會增加格鬥刀精通點數。"
+  "JIANGXIAOMOD-JIANGXIAOMODCOMBATKNIFE.description": "代表格鬥刀精通的技巧。每打出一張此類卡片，會增加格鬥刀精通點數。",
+
+  "JIANGXIAOMOD-JIANGXIAOMODBASICARTS.title": "基礎技藝",
+  "JIANGXIAOMOD-JIANGXIAOMODBASICARTS.description": "代表所有武器精通的加總等級。"
 }

@@ -2,16 +2,15 @@ using BaseLib.Utils;
 using JiangXiaoMod.Code.Cards.CardModels;
 using JiangXiaoMod.Code.Character;
 using JiangXiaoMod.Code.Powers;
-using JiangXiaoMod.Code.Relics;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Localization.DynamicVars; // 確認此命名空間正確
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Runs; // 引入此項以支持圖鑑中的 Owner 獲取
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Entities.Players;
+using JiangXiaoMod.Code.Extensions;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace JiangXiaoMod.Code.Cards.Rare;
 
@@ -19,56 +18,52 @@ namespace JiangXiaoMod.Code.Cards.Rare;
 public class Resentment : JiangXiaoCardModel
 {
     public const string CardId = "Resentment";
-    private const string _mKey = "MVar";
+    
+    // [STS2_Optimization] 建議使用 "M" 作為 Key，以便於 cards.json 調用 {M}
+    private const string _mKey = "M";
 
     public Resentment() : base(1, CardType.Power, CardRarity.Rare, TargetType.Self)
     {
-        // 構造函數保持簡潔
+        // [STS2_Standard] 在構造函數註冊變量，會自動加入基類的 _customVars 列表
+        JJCustomVar(_mKey, 30m);
+        JJPowerTip<ResentmentPower>();
     }
 
-    // [STS2_Update] 變量定義應保持穩定，數值給予初始默認值
-    protected override IEnumerable<DynamicVar> CanonicalVars => [ 
-        new DynamicVar(_mKey, 30m) 
-    ];
-
-    // [STS2_BestPractice] 這裡是更新動態數值的主戰場
-    public void UpdateStatsBasedOnRank()
+    // [STS2_Logic] 此處負責處理隨星技等級變化的數值
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
-        // 獲取當前 Player (處理圖鑑中的 null 情況)
-        var player = Owner ?? RunManager.Instance?.DebugOnlyGetState()?.Players?.FirstOrDefault();
-        
-        int currentRank = 0;
-        if (player != null)
+        // 使用 TryGetValue 確保變量安全存取
+        if (DynamicVars.TryGetValue(_mKey, out var mVar))
         {
-            var relic = player.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-            currentRank = relic?.SkillRank ?? 0;
+            // 邏輯：基礎 30 + (星技等級 * 10)
+            // 等級 1 時機率為 40，等級 5 時為 80
+            mVar.BaseValue = 30 + (skillRank * 10);
         }
-
-        // 計算並更新 DynamicVars 中的數值
-        decimal displayChance = 30 + (currentRank * 10);
-        DynamicVars[_mKey].BaseValue = displayChance;
     }
 
     public override Task BeforeCombatStart()
     {
+        // 戰鬥開始前主動刷新一次數值
         UpdateStatsBasedOnRank();
         return base.BeforeCombatStart();
     }
+
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        // 在打出前強制更新一次數值，確保萬無一失
+        // 打出時再次刷新，確保機率與當前等級同步
         UpdateStatsBasedOnRank();
 
-        // 施加能力
         if (Owner?.Creature != null)
         {
+            // 施加能力。注意：ResentmentPower 內部若也需此機率數值，
+            // 建議在 Power 類中同樣調用 JiangXiaoUtils.GetSkillRank(player)
             await PowerCmd.Apply<ResentmentPower>(Owner.Creature, 1, Owner.Creature, this);
         }
     }
 
     protected override void OnUpgrade()
     {
-        // 0 費
+        // 升級效果：能量消耗 1 -> 0
         EnergyCost.UpgradeBy(-1);
     }
 }

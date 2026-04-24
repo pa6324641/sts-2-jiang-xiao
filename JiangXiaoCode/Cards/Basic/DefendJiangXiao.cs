@@ -17,6 +17,7 @@ using BaseLib.Utils;
 using JiangXiaoMod.Code.Character;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using JiangXiaoMod.Code.Cards.CardModels;
+using MegaCrit.Sts2.Core.Entities.Players;
 
 namespace JiangXiaoMod.Code.Cards.Basic;
 
@@ -52,39 +53,17 @@ public sealed class DefendJiangXiao : JiangXiaoCardModel
     /// 核心邏輯：根據當前星技品質等級更新格擋基礎值。
     /// 公式：(基礎 5 + 升級 3) + (等級 - 1) * 3
     /// </summary>
-    public void UpdateStatsBasedOnRank()
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
         // 安全檢查：確保 DynamicVars 已經被系統初始化
         if (DynamicVars?.Block == null) return;
 
         // 調用 JiangXiaoUtils 獲取遺物提供的品質等級 (1-7)
-        int rank = JiangXiaoUtils.GetSkillRank(Owner);
+        // int rank = JiangXiaoUtils.GetSkillRank(Owner);
         decimal currentBase = IsUpgraded ? (BaseBlock + UpgradeBlock) : BaseBlock;
         
         // 更新 BaseValue 會觸發 STS2 的 LocString 自動重繪 UI 數值
-        DynamicVars.Block.BaseValue = currentBase + (rank - 1) * RankBonus;
-    }
-
-    // --- 確保數值即時更新的生命週期掛鉤 ---
-
-    public override Task BeforeCombatStart()
-    {
-        UpdateStatsBasedOnRank();
-        return base.BeforeCombatStart();
-    }
-
-    public override Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
-    {
-        // 當卡片在抽牌堆、棄牌堆、手牌間移動時觸發
-        if (card == this) UpdateStatsBasedOnRank();
-        return base.AfterCardChangedPiles(card, oldPileType, source);
-    }
-
-    public override Task AfterCardDrawn(PlayerChoiceContext choiceContext, CardModel card, bool fromHandDraw)
-    {
-        // 確保抽到手上時數值是最新的
-        if (card == this) UpdateStatsBasedOnRank();
-        return base.AfterCardDrawn(choiceContext, card, fromHandDraw);
+        DynamicVars.Block.BaseValue = currentBase + (skillRank - 1) * RankBonus;
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using JiangXiaoMod.Code.Extensions; // 引用工具類以獲取等級
+using JiangXiaoMod.Code.Extensions;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
@@ -12,58 +13,58 @@ using MegaCrit.Sts2.Core.ValueProps;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using BaseLib.Utils;
 using JiangXiaoMod.Code.Character;
+using JiangXiaoMod.Code.Cards.CardModels;
+using MegaCrit.Sts2.Core.Entities.Players;
+using SmartFormat.Extensions.PersistentVariables;
 
 namespace JiangXiaoMod.Code.Cards.Common;
 
-
 [Pool(typeof(JiangXiaoCardPool))]
-public class UnarmedStrike : CustomCardModel
+public class UnarmedStrike : JiangXiaoCardModel
 {
+    // 定義常量，方便維護
+    private const decimal BaseDmgValue = 3m;
+    private const decimal DmgPerRank = 3m;
+    private const decimal UpgradeDmgBonus = 3m;
+    // private const string Var = "M";
+
     public UnarmedStrike() : base(1, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy)
-    {        
-    }
-    public override HashSet<CardKeyword> CanonicalKeywords => [JiangXiaoModKeywords.JiangXiaoModUNARMED];
-
-    /// <summary>
-    /// 定義卡片變量：Damage (傷害) 與 M (抽牌數)
-    /// </summary>
-    protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new DamageVar(3m, ValueProp.Move),       // 基礎傷害 3
-        new DynamicVar("M", 1m)  // 基礎抽牌 1
-    ];
-
-    /// <summary>
-    /// 每當狀態更新時調用，用於根據「徒手等級」動態調整數值
-    /// </summary>
-    public override Task BeforeCombatStart()
     {
-        UpdateStatsBasedOnRank();
-        return base.BeforeCombatStart();
+        JJKeywordAndTip(JiangXiaoModKeywords.JiangXiaoModUNARMED);
+        JJDamage(BaseDmgValue, ValueProp.Move);
+        JJCustomVar("M", 1m);
     }
 
-    private void UpdateStatsBasedOnRank()
+    /// <summary>
+    /// 核心邏輯：根據等級動態調整數值。
+    /// 由基類 JiangXiaoCardModel 自動在狀態變更時調用。
+    /// </summary>
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
-        // 從 Owner (Player) 獲取徒手等級
-        int rank = JiangXiaoUtils.GetUnarmedRank(Owner);
+        // 獲取「徒手格鬥」專用等級
+        int unarmedRank = JiangXiaoUtils.GetUnarmedRank(player);
         
-        // [邏輯] 傷害：3 + (Rank * 3)
-        // 注意：若 Rank 為 1，則傷害為 6
-        DynamicVars.Damage.BaseValue = 3m + (rank * 3m);
+        // 傷害 = 基礎(3) + 等級加成(rank * 3) + (若升級則 +3)
+        decimal finalBaseDmg = BaseDmgValue + (unarmedRank * DmgPerRank);
+        if (IsUpgraded)
+        {
+            finalBaseDmg += UpgradeDmgBonus;
+        }
         
-        // [邏輯] 抽牌：1 + (Rank / 2)
-        // C# 整數除法會自動捨去小數 (例如 Rank 1 除 2 = 0)
-        DynamicVars["M"].BaseValue = 1m + (rank / 2);
+        DynamicVars.Damage.BaseValue = finalBaseDmg;
+        
+        // 抽牌邏輯：1 + (Rank / 2)
+        DynamicVars["M"].BaseValue = 1m + (unarmedRank / 2);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        // 確保打出時數值是最新的
-        UpdateStatsBasedOnRank();
+        // 注意：基類已處理 UpdateStatsBasedOnRank，此處不需手動調用
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
 
-
         // 1. 執行攻擊動作
-        await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
+        // 使用 PreviewValue 以確保包含力量 (Strength) 等戰鬥內加成
+        await DamageCmd.Attack(DynamicVars.Damage.PreviewValue)
             .FromCard(this)
             .Targeting(cardPlay.Target)
             .WithHitFx("vfx/vfx_attack_slash")
@@ -79,8 +80,11 @@ public class UnarmedStrike : CustomCardModel
 
     protected override void OnUpgrade()
     {
-        // 升級效果：基礎傷害再 +3 (可根據需求調整)
-        DynamicVars.Damage.UpgradeValueBy(3m);
+        // STS2 建議：在 OnUpgrade 中處理能量降低
         EnergyCost.UpgradeBy(-1);
+        
+        // 數值的實際更新會交給 ApplyRankLogic 處理
+        // 我們手動觸發一次更新以確保 UI 立即反應
+        UpdateStatsBasedOnRank();
     }
 }

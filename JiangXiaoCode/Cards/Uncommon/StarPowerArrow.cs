@@ -13,69 +13,72 @@ using MegaCrit.Sts2.Core.ValueProps;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using JiangXiaoMod.Code.Character;
 using BaseLib.Utils;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
+using JiangXiaoMod.Code.Cards.CardModels;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace JiangXiaoMod.Code.Cards.Uncommon;
 
-
 [Pool(typeof(JiangXiaoCardPool))]
-public class StarPowerArrow : CustomCardModel
-{
-    // [設定] 4費，攻擊牌，罕見，指向敵方
+public class StarPowerArrow : JiangXiaoCardModel
+{  
+    // 數值平衡常數 (放在類別頂部方便調整)
+    private const decimal DefaultBase = 3m;    // 未升級基礎
+    private const decimal UpgradedBase = 6m;   // 升級後基礎
+    private const decimal BowGrowth = 3m;      // 每級弓箭成長
+
     public StarPowerArrow() : base(4, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy)
-    {        
-    }
-
-    public override HashSet<CardKeyword> CanonicalKeywords => [JiangXiaoModKeywords.JiangXiaoModBOW];
-
-    protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new DamageVar(6m, ValueProp.Move) // 初始基礎傷害設為 6
-    ];
-
-    public override Task BeforeCombatStart()
     {
-        UpdateStatsBasedOnRank();
-        return base.BeforeCombatStart();
+        // 1. 添加標籤
+        // CanonicalKeywords.Add(JiangXiaoModKeywords.JiangXiaoModBOW);
+        JJKeywordAndTip(JiangXiaoModKeywords.JiangXiaoModBOW);
+        // 2. 初始化原生 Damage 變量 (會被 JJDamage 自動加入 _customVars)
+        JJDamage(DefaultBase, ValueProp.Move);
     }
 
     /// <summary>
-    /// 核心邏輯：計算 (3 + 3 * 弓Rank) * 星力等級
+    /// 核心邏輯：將所有動態加成直接算進原生 {Damage} 中
+    /// 公式：(基礎[3或6] + 弓Rank * 3) * 星力等級
     /// </summary>
-    private void UpdateStatsBasedOnRank()
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
-        // 獲取兩種等級
-        int bowRank = JiangXiaoUtils.GetBowRank(Owner);
-        int skillRank = JiangXiaoUtils.GetSkillRank(Owner);
+        // 獲取弓箭等級
+        int bowRank = JiangXiaoUtils.GetBowRank(player);
         
-        // [邏輯解釋] 
-        // 基礎傷害 = 3
-        // 每弓箭等級 +3 基礎傷害 -> (3 + 3 * bowRank)
-        // 最後乘以星力等級 -> * skillRank
-        decimal baseCalc = 3m + (bowRank * 3m);
-        DynamicVars.Damage.BaseValue = baseCalc * skillRank;
+        // 1. 根據升級狀態決定「起始基礎值」
+        decimal currentBase = IsUpgraded ? UpgradedBase : DefaultBase;
+        
+        // 2. 計算包含弓箭成長的「複合基礎值」
+        decimal compoundBase = currentBase + (bowRank * BowGrowth);
+        
+        // 3. 直接更新原生 Damage 的 BaseValue (乘以星力等級)
+        // 這樣在 Localization 中使用 {Damage:diff()} 就會直接顯示最終結果
+        DynamicVars.Damage.BaseValue = compoundBase * skillRank;
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        // 確保打出時數值是最新的
+        // 打出時確保數值最新
         UpdateStatsBasedOnRank();
-        ArgumentNullException.ThrowIfNull(cardPlay.Target);
+        
+        if (cardPlay.Target == null) return;
 
-        // 執行攻擊
+        // 執行攻擊，直接讀取計算後的 BaseValue
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
             .Targeting(cardPlay.Target)
-            .WithHitFx("vfx/vfx_attack_slash") // 建議根據星力主題更換特效
+            // .WithHitFx("vfx/vfx_hit_star") 
             .Execute(choiceContext);
     }
 
     protected override void OnUpgrade()
     {
-        // 升級建議：減少費用的同時，提升基礎成長數值
-        // 原本 (3 + 3 * BowRank)，升級後變為 (6 + 4 * BowRank)?
-        // 這裡暫定基礎值提升
-        DynamicVars.Damage.UpgradeValueBy(3m); 
-        EnergyCost.UpgradeBy(-1); // 4費 -> 3費
+        // 1. 費用 4 -> 3
+        EnergyCost.UpgradeBy(-1);
+        
+        // 2. 刷新數值。
+        // 因為 ApplyRankLogic 內部會判斷 IsUpgraded，
+        // 所以呼叫 UpdateStatsBasedOnRank 時，傷害會自動從 3 起跳變成 6 起跳。
+        UpdateStatsBasedOnRank();
     }
 }

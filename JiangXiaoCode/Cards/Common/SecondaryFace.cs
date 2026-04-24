@@ -18,6 +18,8 @@ using JiangXiaoMod.Code.Cards.CardModels;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.HoverTips;
 using JiangXiaoMod.Code.Keywords;
+using MegaCrit.Sts2.Core.TestSupport;
+using MegaCrit.Sts2.Core.Entities.Players;
 
 namespace JiangXiaoMod.Code.Cards.Common;
 
@@ -25,30 +27,22 @@ namespace JiangXiaoMod.Code.Cards.Common;
 public class SecondaryFace : JiangXiaoCardModel
 {
     public const string CardId = "SecondaryFace";
+    // public const string Var = "M";
+
 
     public SecondaryFace() : base(2, CardType.Skill, CardRarity.Common, TargetType.None)
     {
+        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        JJCustomVar("M", 1m);
     }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new DynamicVar("M", 1m)
-    ];
-    protected override IEnumerable<IHoverTip> ExtraHoverTips => [
-        HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star),
-        HoverTipFactory.FromKeyword(CardKeyword.Exhaust)
-    ];
-
-
-    public void UpdateStatsBasedOnRank()
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
-        var player = Owner;
+        // var player = Owner;
         if (player == null) return;
 
-        var relic = player.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-        int currentRank = relic?.SkillRank ?? 1;
-
-        // 設定 M 值：rank 1-3 -> 1, rank 4-5 -> 2, rank 6-7 -> 3
-        decimal mValue = currentRank switch
+        // 設定 M 值邏輯
+        decimal mValue = skillRank switch
         {
             >= 6 => 3m,
             >= 4 => 2m,
@@ -57,9 +51,16 @@ public class SecondaryFace : JiangXiaoCardModel
 
         if (DynamicVars.ContainsKey("M"))
         {
+            // [關鍵] 同步基礎值與預覽值，這樣卡面才會變色並顯示正確數字
             DynamicVars["M"].BaseValue = mValue;
+            DynamicVars["M"].PreviewValue = mValue; 
         }
     }
+    // public override Task BeforeCombatStart()
+    // {
+    //     UpdateStatsBasedOnRank();
+    //     return base.BeforeCombatStart();
+    // }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
@@ -106,6 +107,11 @@ public class SecondaryFace : JiangXiaoCardModel
             // 4. 屬性修改
             copy.EnergyCost.SetCustomBaseCost(0);
             copy.AddKeyword(CardKeyword.Exhaust);
+
+            if (copy is JiangXiaoCardModel jxCard)
+            {
+                jxCard.UpdateStatsBasedOnRank();
+            }
 
             // 5. 加入戰鬥手牌 (true 會觸發卡片飛入手牌的動畫)
             await CardPileCmd.AddGeneratedCardToCombat(copy, PileType.Hand, true);

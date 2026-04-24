@@ -1,65 +1,54 @@
-using BaseLib.Abstracts;
-using JiangXiaoMod.Code.Character;
-using JiangXiaoMod.Code.Powers;
-using JiangXiaoMod.Code.Relics;
-using MegaCrit.Sts2.Core.Context;
-using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.CardPools;
-using MegaCrit.Sts2.Core.Commands;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BaseLib.Utils;
-using MegaCrit.Sts2.Core.Runs;
-using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using JiangXiaoMod.Code.Cards.CardModels;
+using JiangXiaoMod.Code.Extensions;
+using JiangXiaoMod.Code.Keywords;
+using JiangXiaoMod.Code.Powers;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using JiangXiaoMod.Code.Extensions;
 using MegaCrit.Sts2.Core.HoverTips;
-using JiangXiaoMod.Code.Keywords;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.CardPools;
+using MegaCrit.Sts2.Core.Entities.Players;
+using BaseLib.Utils;
+using JiangXiaoMod.Code.Character;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using SmartFormat.Extensions.PersistentVariables;
 
 namespace JiangXiaoMod.Code.Cards.Common;
 
 [Pool(typeof(JiangXiaoCardPool))]
 public class TearOfSorrow : JiangXiaoCardModel
 {
-    public const string CardId = "TearOfSorrow";
+    // 建議對齊 Localization 的 ID 命名規範
+    public const string CardId = "JIANGXIAOMOD-TEAR_OF_SORROW";
+    // public const string Var = "M";
 
     public TearOfSorrow() : base(4, CardType.Skill, CardRarity.Common, TargetType.None)
     {
-        // 這裡建構子應傳入 CardId，父類會處理資源加載
+        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        JJPowerTip<TearOfSorrowPower>();
+        JJCustomVar("M", 1m);
     }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new DynamicVar("M", 1m) 
-    ];
-    protected override IEnumerable<IHoverTip> ExtraHoverTips => [
-        HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star),
-        HoverTipFactory.FromPower<TearOfSorrowPower>()
-    ];
-
     /// <summary>
-    /// 根據星技品質 rank 計算 M 值 (層數)
-    /// rank 1-3: 1層
-    /// rank 4-5: 2層
-    /// rank 6-7: 3層
+    /// 根據星技品質動態調整 M 值 (層數)
     /// </summary>
-    public void UpdateStatsBasedOnRank()
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
-        var player = Owner ?? RunManager.Instance.DebugOnlyGetState()?.Players.FirstOrDefault();
-        int rank = JiangXiaoUtils.GetSkillRank(player);
+        // 使用 switch 表達式讓邏輯更清晰
+        decimal mAmount = skillRank switch
+        {
+            <= 3 => 1m,
+            <= 5 => 2m,
+            _    => 3m
+        };
 
-        decimal mAmount;
-        if (rank <= 3)
-            mAmount = 1m;
-        else if (rank <= 5)
-            mAmount = 2m;
-        else
-            mAmount = 3m;
-
-        // 若卡片已升級，額外增加 1 層 (可根據需求調整升級邏輯)
+        // 處理升級加成：屬性應為 Upgraded
         if (IsUpgraded)
         {
             mAmount += 1m;
@@ -68,50 +57,33 @@ public class TearOfSorrow : JiangXiaoCardModel
         DynamicVars["M"].BaseValue = mAmount;
     }
 
-    public override Task BeforeCombatStart()
-    {
-        UpdateStatsBasedOnRank();
-        return base.BeforeCombatStart();
-    }
-
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        var combat = CombatState;
-        // 驗證戰鬥狀態與持有者
-        if (combat == null || Owner?.Creature == null) return;
+        if (CombatState == null || Owner?.Creature == null) return;
 
-        var player = this.Owner;
-        
-        // 1. 播放前更新數值，確保抓取的 M 值準確
-        UpdateStatsBasedOnRank();
-        int rank = JiangXiaoUtils.GetSkillRank(player);
+        // 獲取等級以決定目標範圍
+        int rank = JiangXiaoUtils.GetSkillRank(Owner);
         decimal mAmount = DynamicVars["M"].BaseValue;
 
-        // 2. 確定目標群體
-        IEnumerable<Creature> targets;
-        if (rank <= 3)
-        {
-            // Rank 1-3: 影響全場單位 (盟友 + 敵人)
-            targets = combat.Allies.Concat(combat.Enemies).ToList();
-        }
-        else
-        {
-            // Rank 4 以上: 僅影響敵人
-            targets = combat.Enemies;
-        }
+        // 決定受影響目標
+        // Rank 1-3: 影響全場 (盟友 + 敵人)；Rank 4+: 僅影響敵人
+        IEnumerable<Creature> targets = (rank <= 3) 
+            ? [.. CombatState.Allies, .. CombatState.Enemies] 
+            : CombatState.Enemies;
 
-        // 3. 執行效果
         foreach (var target in targets)
         {
-            // 施加傷之淚能力 (TearOfSorrowPower)
-            // 傳入目標實體、計算後的層數、來源實體、來源卡片
+            // 施加能力，傳入層數與來源
             await PowerCmd.Apply<TearOfSorrowPower>(target, mAmount, Owner.Creature, this);
         }
     }
 
     protected override void OnUpgrade()
     {
-        // 升級時即時更新一次數值預覽
+        // 建議：高費卡牌升級通常會減費，增加實用性
+        EnergyCost.UpgradeBy(-1); 
+        
+        // 手動觸發一次數值更新，讓 UI 立即刷新預覽
         UpdateStatsBasedOnRank();
     }
 }

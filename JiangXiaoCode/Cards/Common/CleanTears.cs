@@ -14,90 +14,88 @@ using JiangXiaoMod.Code.Extensions;
 using MegaCrit.Sts2.Core.Runs;
 using BaseLib.Utils;
 using JiangXiaoMod.Code.Character;
-using JiangXiaoMod.Code.Keywords; // 必須引用以識別 PileType
+using JiangXiaoMod.Code.Keywords;
+using JiangXiaoMod.Code.Cards.CardModels;
+using MegaCrit.Sts2.Core.Entities.Powers;
 
-
-namespace JiangXiaoMod.Code.Cards.Common
-{
+namespace JiangXiaoMod.Code.Cards.Common;
 
 [Pool(typeof(JiangXiaoCardPool))]
-public class CleanTears : CustomCardModel
-	{
-		// 構造函數：確保參數與父類匹配
-		public CleanTears() : base(2, CardType.Skill, CardRarity.Common, TargetType.None)
-		{
+public sealed class CleanTears : JiangXiaoCardModel
+{
+    public const string CardId = "JIANGXIAOMOD-CLEAN_TEARS";
+    // public const string M = "M";
 
-		}
+    public CleanTears() : base(2, CardType.Skill, CardRarity.Common, TargetType.None)
+    {
+        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        JJCustomVar("M", 1m);
+    }
 
-		protected override IEnumerable<DynamicVar> CanonicalVars => [
-			new DynamicVar("M", 1m)
-		];
+    // protected override IEnumerable<DynamicVar> CanonicalVars => [
+    //     new DynamicVar("M", 1m)
+    // ];
 
-		public void UpdateStatsBasedOnRank()
-		{
-			if (Owner == null) 
-			{
-				DynamicVars["M"].BaseValue = 1m;
-				return;
-			}
-			// Owner 通常是 PlayerModel
-			var player = this.Owner;
-			// 透過之前定義的工具類獲取 Rank
-			int rank = JiangXiaoUtils.GetSkillRank(player);
-			
-			decimal mValue = rank switch
-			{
-				>= 6 => 5m,
-				>= 4 => 3m,
-				_ => 1m
-			};
+    protected override void ApplyRankLogic(Player? player, int skillRank)
+    {
+        decimal mValue = skillRank switch
+        {
+            >= 6 => 5m,
+            >= 4 => 3m,
+            _ => 1m
+        };
+        DynamicVars["M"].BaseValue = mValue;
+    }
 
-			DynamicVars["M"].BaseValue = mValue;
-		}
-	public override Task BeforeCombatStart()
-	{
-		UpdateStatsBasedOnRank();
-		return base.BeforeCombatStart();
-	}
+ 	protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        var combat = CombatState;
+        if (combat == null) return;
 
-	protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
-	{
-		var combat = CombatState;
-		if (combat == null) return;
+        int mLimit = (int)DynamicVars["M"].BaseValue;
 
-		UpdateStatsBasedOnRank();
-		int mLimit = (int)DynamicVars["M"].BaseValue;
+        // --- 遍歷戰鬥中的所有玩家 (支援多人/友方) ---
+        foreach (var playerEntity in combat.Players)
+        {
+            // [修正] Player 模型不直接持有 Powers，需訪問其 Creature 實體
+            // 同時加上 null 檢查以確保安全
+            if (playerEntity.Creature != null)
+            {
+                // 1. 移除該玩家生物實體身上所有的 Debuff
+                var debuffs = playerEntity.Creature.Powers.Where(p => p.Type == PowerType.Debuff).ToList();
+                foreach (var debuff in debuffs)
+                {
+                    // PowerCmd.Remove 通常需要指定目標生物或直接傳入能力實例
+                    await PowerCmd.Remove(debuff);
+                }
+            }
 
-		foreach (var playerEntity in combat.Players)
-		{
-			var combatState = playerEntity.PlayerCombatState;
-			if (combatState == null) continue;
+            // 2. 獲取該玩家的戰鬥狀態以訪問牌堆 (這個部分原先就是正確的)
+            var pCombatState = playerEntity.PlayerCombatState;
+            if (pCombatState == null) continue;
 
-			// 定義一個內部方法來處理單一牌堆的移除邏輯
-			async Task PurgeFromPile(CardPile pile)
-			{
-				var status = pile.Cards.Where(c => c.Type == CardType.Status).Take(mLimit).ToList();
-				var curses = pile.Cards.Where(c => c.Type == CardType.Curse).Take(mLimit).ToList();
-				var toPurge = status.Concat(curses).ToList();
+            // 定義內部邏輯來處理該玩家的牌堆
+            async Task PurgePlayerPile(CardPile pile)
+            {
+                var toPurge = pile.Cards
+                    .Where(c => c.Type == CardType.Status || c.Type == CardType.Curse)
+                    .Take(mLimit)
+                    .ToList();
 
-				if (toPurge.Count > 0)
-				{
-					// [核心修正] 使用 Add 移至消耗堆，這會觸發隱藏牌堆飛出的 VFX 特效
-					// 且 Add 會自動調用 RemoveFromCurrentPile，數據最安全
-					await CardPileCmd.Add(toPurge, PileType.Exhaust, CardPilePosition.Bottom, this, false);
-				}
-			}
+                if (toPurge.Count > 0)
+                {
+                    await CardPileCmd.Add(toPurge, PileType.Exhaust, CardPilePosition.Bottom, this);
+                }
+            }
 
-			// 分別對三個牌堆執行移除 (這樣每個牌堆都會各自嘗試移除 M 張)
-			await PurgeFromPile(combatState.Hand);
-			await PurgeFromPile(combatState.DrawPile);
-			await PurgeFromPile(combatState.DiscardPile);
-		}
-	}
-		protected override void OnUpgrade()
-		{
-			// 此牌主要隨品質提升，若需升級效果可在此添加
-			EnergyCost.UpgradeBy(-1);
-		}
-	}
+            // 分別淨化該玩家的手牌、抽牌堆、棄牌堆
+            await PurgePlayerPile(pCombatState.Hand);
+            await PurgePlayerPile(pCombatState.DrawPile);
+            await PurgePlayerPile(pCombatState.DiscardPile);
+        }
+    }
+    protected override void OnUpgrade()
+    {
+        EnergyCost.UpgradeBy(-1);
+    }
 }

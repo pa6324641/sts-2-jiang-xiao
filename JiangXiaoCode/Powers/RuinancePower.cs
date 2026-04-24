@@ -10,74 +10,88 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Entities.Powers;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Runs;
 using BaseLib.Extensions;
-using JiangXiaoMod.Code.Extensions; // 必須引用以獲取全局狀態
+using JiangXiaoMod.Code.Extensions;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using System.Reflection;
 
 namespace JiangXiaoMod.Code.Powers;
 
-public sealed class RuinancePower : CustomPowerModel
+public sealed class RuinancePower : JiangXiaoPowerModel
 {
-    private const string VarResist = "resist";
+	// 確保這裡的字串與 .json 中的 {Amount} 完全一致
+	private const string VarAmount = "M";
 
-    public override PowerType Type => PowerType.Buff;
-    // 多人模式建議保持 StackType.None 或按需求調整，但 constructor 必須受控
-    public override PowerStackType StackType => PowerStackType.Counter; 
-    public override string CustomPackedIconPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".PowerImagePath();
-    public override string CustomBigIconPath => CustomPackedIconPath;
+	public override PowerType Type => PowerType.None;
+	public override PowerStackType StackType => PowerStackType.Counter; 
 
-    // 必須保留無參數構造函數供系統註冊用
-    public RuinancePower() : base() { }
-    
-    // 用於戰鬥中實例化的構造函數
-    public override decimal ModifyDamageAdditive(Creature? target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)
-    {
-        if (Owner != null && target == Owner && amount > 0)
-        {
-            return -(decimal)this.Amount;
-        }
-        return 0m;
-    }
+	// 無參數構造函數（系統註冊用）
+	public RuinancePower() : base() { }
+	
+	// 傷害減免邏輯
+	public override decimal ModifyDamageAdditive(Creature? target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)
+	{
+		// 只有當擁有者是被攻擊者，且傷害大於 0 時才生效
+		if (Owner != null && target == Owner && amount > 0)
+		{
+			// [注意] STS2 中此處 return 的數值會直接加到傷害總值上，所以負數代表減傷
+			// 如果 this.Amount 是正數（層數），則減去該層數
+			return -(decimal)this.Amount;
+		}
+		return 0m;
+	}
 
-    public override Task BeforeDamageReceived(PlayerChoiceContext choiceContext, Creature target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)
-    {
-        if (Owner != null && target == Owner && amount > 0)
-        {
-            Flash(); 
-        }
-        return Task.CompletedTask;
-    }
+	public override Task BeforeDamageReceived(PlayerChoiceContext choiceContext, Creature target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)
+	{
+		if (Owner != null && target == Owner && amount > 0)
+		{
+			Flash(); 
+		}
+		return Task.CompletedTask;
+	}
 
-    // [STS2 重要修正]：CanonicalVars 用於 UI 顯示
-    protected override IEnumerable<DynamicVar> CanonicalVars
-    {
-        get
-        {
-            decimal displayValue = (decimal)this.Amount;
+	// [STS2 重要] 處理 UI 動態數值顯示
+	protected override IEnumerable<DynamicVar> CanonicalVars
+	{
+		get
+		{
+			decimal displayValue;
 
-            // 如果 Amount 為 0 (代表這是 ModelDb 裡的預覽單例)，嘗試即時計算預覽值
-            if (displayValue == 0)
-            {
-                displayValue = CalculatePreviewResist();
-            }
+			// 1. 如果在戰鬥中，且對象已存在（實例化階段）
+			if (Owner != null)
+			{
+				displayValue = (decimal)this.Amount;
+			}
+			// 2. 如果是預覽狀態（例如商店、卡牌說明、圖表單例）
+			else
+			{
+				displayValue = CalculatePreviewResist();
+			}
 
-            yield return new DynamicVar(VarResist, displayValue);
-        }
-    }
+			// 返回動態變量，確保 key 名稱與 JSON 中的 {Amount} 匹配
+			yield return new DynamicVar(VarAmount, displayValue);
+		}
+	}
 
-    // 專門為 UI 預覽設計的數值計算
-    private decimal CalculatePreviewResist()
-    {
-        // 嘗試從全域 RunManager 抓取玩家當前的遺物狀態進行預覽
-        var player = RunManager.Instance?.DebugOnlyGetState()?.Players.FirstOrDefault();
-        if (player == null) return 6m; // 預設基礎值
+	private decimal CalculatePreviewResist()
+	{
+		// [修正] 根據你之前的腳本範例，使用 DebugOnlyGetState() 來獲取狀態
+		// 這是因為某些版本的 sts2.dll 將 State 設為 internal 或有不同的命名
+		var runState = RunManager.Instance?.DebugOnlyGetState();
+		var player = runState?.Players?.FirstOrDefault();
+		
+		if (player != null)
+		{
+			// 調用你的工具類獲取星技等級
+			int rank = JiangXiaoUtils.GetSkillRank(player);
+			
+			// 根據等級計算預覽值 (目前設定為固定 3，你可以改為公式)
+			// 例如：return 3 + (rank - 1) * 2;
+			return 3m; 
+		}
 
-        // 這裡套用你的遺物邏輯，例如：
-        // var relic = player.Relics.OfType<StarSkillQuality>().FirstOrDefault();
-        // int rank = relic?.GetRank() ?? 1;
-        // return 6 + (rank - 1) * 6;
-        
-        return 6m; 
-    }
+		// 萬一抓不到玩家（例如在主選單預覽時），回傳基礎值
+		return 3m; 
+	}
 }

@@ -22,15 +22,19 @@ public static class JiangXiaoUtils
     /// </summary>
     public static IInnerStarMap? GetStarMap(Player? player)
     {
-        // 直接使用介面進行過濾，OfType 會同時抓到實作了該介面的所有遺物
+        // STS2 推薦做法：使用 OfType 過濾實作了介面的所有遺物
         return player?.Relics.OfType<IInnerStarMap>().FirstOrDefault();
     }
+
+    /// <summary>
     /// 快速獲取當前星點數
+    /// </summary>
     public static int GetTotalSkillPoints(Player? player)
     {
         var starMap = GetStarMap(player);
         return starMap?.JiangXiaoMod_SkillPoints ?? 0;
     }
+
     // --- 核心遺物獲取 ---
 
     /// <summary>
@@ -39,7 +43,6 @@ public static class JiangXiaoUtils
     public static int GetSkillRank(Player? player)
     {
         if (player == null) return 1;
-        // [STS2_Optimization] 使用 OfType 直接過濾類型
         var relic = player.Relics.OfType<StarSkillQuality>().FirstOrDefault();
         return relic?.SkillRank ?? 1;
     }
@@ -49,10 +52,11 @@ public static class JiangXiaoUtils
     /// </summary>
     public static BasicArts? GetBasicArtsRelic(Player? player)
     {
+        // 使用 OfType 替代 as 轉型，代碼更簡潔
         return player?.Relics.OfType<BasicArts>().FirstOrDefault();
     }
 
-    // --- 技藝等級獲取 (簡化版) ---
+    // --- 技藝等級獲取 ---
 
     public static int GetUnarmedRank(Player? player) => GetArtRank(player, BasicArtType.Unarmed);
     public static int GetBladeRank(Player? player)   => GetArtRank(player, BasicArtType.Blade);
@@ -70,11 +74,24 @@ public static class JiangXiaoUtils
         if (relic == null) return 1;
 
         int pts = GetArtPoints(player, type);
+        // 調用 BasicArts 遺物模型中的等級計算邏輯
         return relic.GetRank(pts);
     }
 
     /// <summary>
-    /// 萬用數值讀取器 (使用 Enum 確保安全)
+    /// 獲取所有基礎技藝 Rank 的總和（用於某些特殊星技的加成計算）
+    /// </summary>
+    public static int GetTotalBasicArtRankSum(Player? player)
+    {
+        if (player == null) return 0;
+        
+        // 修正點：直接調用本類別的靜態方法 GetArtRank
+        return Enum.GetValues<BasicArtType>()
+                   .Sum(type => GetArtRank(player, type));
+    }
+
+    /// <summary>
+    /// 萬用數值讀取器
     /// </summary>
     public static int GetArtPoints(Player? player, BasicArtType type)
     {
@@ -93,7 +110,9 @@ public static class JiangXiaoUtils
         };
     }
     
-    // 為了相容性，保留原有的字串版本但標記為過時，或內部轉向 Enum
+    /// <summary>
+    /// 字串版本兼容 (主要用於從本地化或外部配置讀取時)
+    /// </summary>
     public static int GetArtPoints(Player? player, string artType)
     {
         if (Enum.TryParse<BasicArtType>(artType, true, out var type))

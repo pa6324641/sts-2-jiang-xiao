@@ -12,6 +12,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using MegaCrit.Sts2.Core.Entities.Players;
 
 namespace JiangXiaoMod.Code.Cards.Token;
 
@@ -50,5 +51,9 @@ public class StrengthenToken : JiangXiaoCardModel
                 CardCmd.Upgrade(item, CardPreviewStyle.None);
             }
         }
+    }
+    protected override void ApplyRankLogic(Player? player, int skillRank)
+    {
+        
     }
 }

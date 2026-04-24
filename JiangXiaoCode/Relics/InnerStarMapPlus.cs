@@ -40,17 +40,18 @@ public sealed class InnerStarMapPlus : CustomRelicModel, IInnerStarMap
             if (_skillPoints == value) return;
             _skillPoints = value;
 
-            // [重要]：利用反編譯代碼中確認的 IsMutable (或 IsCanonical) 進行檢查
-            // 只有當遺物是「可變實例」且已有「擁有者」時才刷新 UI
-            if (base.IsMutable && Owner != null) 
+            // [關鍵修正]：升級版也必須通知其他遺物刷新
+            if (base.IsMutable && Owner != null)
             {
                 var player = Owner;
+                // 通知品質遺物
                 player.Relics.OfType<StarSkillQuality>().FirstOrDefault()?.RefreshDisplay();
+                // 通知等級遺物
                 player.Relics.OfType<StarPowerLevel>().FirstOrDefault()?.RefreshDisplay();
-                player.Relics.OfType<BasicArts>().FirstOrDefault()?.RefreshDisplay();
             }
-            RefreshDynamicText();
-        }
+
+            RefreshDynamicText(); 
+        } 
     }
 
     private const string VarPoints = "points";
@@ -107,4 +108,5 @@ public sealed class InnerStarMapPlus : CustomRelicModel, IInnerStarMap
     }
 
     public override RelicModel? GetUpgradeReplacement() => null;
+    
 }

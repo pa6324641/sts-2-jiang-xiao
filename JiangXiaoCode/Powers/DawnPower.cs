@@ -15,10 +15,10 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 
 namespace JiangXiaoMod.Code.Powers;
 
-public class DawnPower : CustomPowerModel
+public class DawnPower : JiangXiaoPowerModel
 {
     public const string PowerId = "DawnPower";
-    private const string VarM = "M";
+    private const string VarM = "Amount";
 
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Counter;

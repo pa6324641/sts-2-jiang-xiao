@@ -1,5 +1,6 @@
 using BaseLib.Abstracts;
 using BaseLib.Utils;
+using JiangXiaoMod.Code.Cards.CardModels;
 using JiangXiaoMod.Code.Character;
 using JiangXiaoMod.Code.Extensions;
 using MegaCrit.Sts2.Core.Combat;
@@ -9,9 +10,10 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.CardPools;
 namespace JiangXiaoMod.Code.Cards.Token;
+using MegaCrit.Sts2.Core.Entities.Players;
 
 [Pool(typeof(TokenCardPool))]
-public sealed class BlessingAllAllyToken : CustomCardModel
+public sealed class BlessingAllAllyToken : JiangXiaoCardModel
 {
     public const string CardId = "JIANGXIAOMOD-BLESSING-TOKEN-ALL-ALLY";
     public BlessingAllAllyToken() : base(0, CardType.Skill, CardRarity.Token, TargetType.None)
@@ -32,5 +34,9 @@ public sealed class BlessingAllAllyToken : CustomCardModel
                 await CreatureCmd.Heal(e, DynamicVars["HealAmount"].BaseValue);
             }
         }
+    }
+    protected override void ApplyRankLogic(Player? player, int skillRank)
+    {
+        
     }
 }

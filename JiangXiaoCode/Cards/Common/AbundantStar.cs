@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Entities.Players;
 
 namespace JiangXiaoMod.Code.Cards.Common;
 
@@ -32,18 +33,21 @@ public class AbundantStar : JiangXiaoCardModel
     public AbundantStar() : base(1, CardType.Skill, CardRarity.Common, TargetType.None)
     {
         // 初始化時設定基礎消耗為 1
+        JJCustomVar("M",1m);
+        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        JJStaticTip(StaticHoverTip.Energy);
     }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new DynamicVar("M", 1m) // 初始值為 1，會由 UpdateStatsBasedOnRank 動態覆蓋
-    ];
+    // protected override IEnumerable<DynamicVar> CanonicalVars => [
+    //     new DynamicVar("M", 1m) // 初始值為 1，會由 UpdateStatsBasedOnRank 動態覆蓋
+    // ];
 
     // [STS2_Compatibility] 關鍵字將顯示於 HoverTip
-    protected override IEnumerable<IHoverTip> ExtraHoverTips => [
-        HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star),
-        HoverTipFactory.Static(StaticHoverTip.Energy)
+    // protected override IEnumerable<IHoverTip> ExtraHoverTips => [
+    //     HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star),
+    //     HoverTipFactory.Static(StaticHoverTip.Energy)
         
-    ];
+    // ];
 
     /// <summary>
     /// 獲取當前角色的星級品質等級
@@ -59,27 +63,25 @@ public class AbundantStar : JiangXiaoCardModel
     /// <summary>
     /// 根據當前星級品質更新變量 M
     /// </summary>
-    public void UpdateStatsBasedOnRank()
-    {
-        int rank = GetQualityRank();
-        
+    protected override void ApplyRankLogic(Player? player, int skillRank)
+    {        
         // 根據規則：1-2 -> 1, 3-4 -> 3, 5-6 -> 5, 7 -> 7
-        decimal calculatedM = rank switch
+        decimal calculatedM = skillRank switch
         {
             <= 2 => 1m,
             <= 4 => 3m,
             <= 6 => 5m,
-            _ => 7m
+            _ => 5m
         };
 
         DynamicVars["M"].BaseValue = calculatedM;
     }
 
-    public override Task BeforeCombatStart()
-    {
-        UpdateStatsBasedOnRank();
-        return base.BeforeCombatStart();
-    }
+    // public override Task BeforeCombatStart()
+    // {
+    //     UpdateStatsBasedOnRank();
+    //     return base.BeforeCombatStart();
+    // }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {

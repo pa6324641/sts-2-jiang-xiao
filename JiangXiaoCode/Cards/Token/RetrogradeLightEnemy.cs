@@ -3,6 +3,8 @@ using JiangXiaoMod.Code.Cards.CardModels;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using MegaCrit.Sts2.Core.Entities.Players;
+using JiangXiaoMod.Code.Extensions;
 
 namespace JiangXiaoMod.Code.Cards.Token;
 
@@ -10,6 +12,7 @@ namespace JiangXiaoMod.Code.Cards.Token;
 public class RetrogradeLightEnemy : JiangXiaoCardModel
 {
     public const string CardId = "RetrogradeLightEnemy";
+    public override string PortraitPath => $"retrograde_light.png".CardImagePath();
 
     public RetrogradeLightEnemy() : base(0, CardType.Skill, CardRarity.Basic, TargetType.AnyEnemy, false)
     {
@@ -35,5 +38,9 @@ public class RetrogradeLightEnemy : JiangXiaoCardModel
             target.SetCurrentHpInternal(averageHp);
         }
         await Task.CompletedTask;
+    }
+    protected override void ApplyRankLogic(Player? player, int skillRank)
+    {
+        
     }
 }

@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Entities.Players;
 
 namespace JiangXiaoMod.Code.Cards.Token;
 
@@ -28,8 +29,8 @@ public class RestToken : JiangXiaoCardModel
         // 確保 Owner 及其戰鬥實體存在
         if (Owner?.Creature == null) return;
 
-        // 1. 計算治療量 (最大生命值的 20%)
-        int healAmount = (int)Math.Ceiling(Owner.Creature.MaxHp * 0.2f);
+        // 1. 計算治療量 (最大生命值的 50%)
+        int healAmount = (int)Math.Ceiling(Owner.Creature.MaxHp * 0.5f);
 
         // 2. 執行治療
         // [修正 CS1503] 
@@ -37,5 +38,9 @@ public class RestToken : JiangXiaoCardModel
         // 參數 2: 治療數值 (int 或 decimal)
         // 參數 3: 是否顯示特效 (bool) -> 根據報錯訊息，這裡應傳入 bool
         await CreatureCmd.Heal(Owner.Creature, healAmount, true);
+    }
+    protected override void ApplyRankLogic(Player? player, int skillRank)
+    {
+        
     }
 }

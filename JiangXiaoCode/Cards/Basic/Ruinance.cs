@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BaseLib.Abstracts;
 using BaseLib.Extensions;
 using BaseLib.Utils;
+using JiangXiaoMod.Code.Cards.CardModels;
 using JiangXiaoMod.Code.Character;
 using JiangXiaoMod.Code.Extensions;
 using JiangXiaoMod.Code.Keywords;
@@ -20,104 +21,86 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 
+
 namespace JiangXiaoMod.Code.Cards.Basic;
 
 [Pool(typeof(JiangXiaoCardPool))]
-public sealed class Ruinance : CustomCardModel
+public sealed class Ruinance : JiangXiaoCardModel
 {
-    private const decimal BaseBlock = 3m;
-    private const decimal UpgradeBlock = 3m;
-    private const decimal BaseResist = 3m;
-    private const decimal RankBonus = 3m;
+    public const string CardId = "JIANGXIAOMOD-RUINANCE";
+    private const string MVarKey = "M";
+
+    private const decimal BaseBlockVal = 3m;
+    private const decimal UpgradeBlockBonus = 3m;
+    private const decimal BaseResistVal = 3m;
+    private const decimal RankBonusVal = 3m;
 
     public Ruinance() : base(1, CardType.Power, CardRarity.Basic, TargetType.Self)
     {
+        // 使用基類輔助方法統一添加星技與被動提示
+        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        JJKeywordAndTip(JiangXiaoModKeywords.Passive);
+        JJBlock(BaseBlockVal, ValueProp.Move);
+        JJCustomVar(MVarKey, BaseResistVal);
     }
 
-    public override bool GainsBlock => true;
+    // public override bool GainsBlock => true;
 
-    // [修正] DynamicVar 只接受 2 個參數：Key 和 數值
-    protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new BlockVar(BaseBlock, ValueProp.Move),
-        new DynamicVar("M", BaseResist) 
-    ];
-
-    public override HashSet<CardKeyword> CanonicalKeywords => [
-        JiangXiaoModKeywords.Star, 
-        JiangXiaoModKeywords.Passive
-    ];
-
-    public override string PortraitPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".CardImagePath();
+    // protected override IEnumerable<DynamicVar> CanonicalVars => [
+    //     new BlockVar(BaseBlockVal, ValueProp.Move),
+    //     new DynamicVar(MVarKey, BaseResistVal) 
+    // ];
 
     /// <summary>
-    /// 更新格擋與忍耐數值，確保 UI 顯示正確
+    /// 合併後的數值邏輯：統一由 ApplyRankLogic 根據 IsUpgraded 與 rank 計算最終值
     /// </summary>
-    public void UpdateStatsBasedOnRank()
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
-        if (DynamicVars == null) return;
+        // 1. 計算格擋：基礎 3，強化後基礎變 6
+        decimal currentBlockBase = BaseBlockVal + (IsUpgraded ? UpgradeBlockBonus : 0m);
+        DynamicVars.Block.BaseValue = currentBlockBase;
 
-        int rank = JiangXiaoUtils.GetSkillRank(Owner);
-        
-        // 更新格擋
-        decimal currentBlockBase = IsUpgraded ? (BaseBlock + UpgradeBlock) : BaseBlock;
-        if (DynamicVars.Block != null)
-        {
-            DynamicVars.Block.BaseValue = currentBlockBase;
-        }
-
-        // [修正] 使用索引器獲取自定義變量 "M"，並進行空值檢查
-        var resistVar = DynamicVars["M"];
-        if (resistVar != null)
-        {
-            resistVar.BaseValue = BaseResist + (rank - 1) * RankBonus;
-        }
+        // 2. 計算忍耐(M)：基礎 3 + (等級-1) * 3
+        DynamicVars[MVarKey].BaseValue = BaseResistVal + (skillRank - 1) * RankBonusVal;
     }
 
-    // --- 生命週期掛鉤 ---
+    /// <summary>
+    /// 強化時僅觸發重算
+    /// </summary>
+    protected override void OnUpgrade() => UpdateStatsBasedOnRank();
+
     public override Task BeforeCombatStart()
     {
         UpdateStatsBasedOnRank();
         return base.BeforeCombatStart();
     }
 
-    public override Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
-    {
-        if (card == this) UpdateStatsBasedOnRank();
-        return base.AfterCardChangedPiles(card, oldPileType, source);
-    }
-
+    /// <summary>
+    /// 被動星技邏輯：第一回合若在抽牌堆則自動打出
+    /// </summary>
     public override async Task BeforeHandDrawLate(Player player, PlayerChoiceContext choiceContext, CombatState combatState)
     {
-        await base.BeforeHandDrawLate(player, choiceContext, combatState);
-
-        if (player?.PlayerCombatState != null && player.PlayerCombatState.DrawPile.Cards.Contains(this))
+        if (player?.PlayerCombatState != null && 
+            player.PlayerCombatState.DrawPile.Cards.Contains(this) && 
+            combatState.RoundNumber == 1)
         {
+            // 自動播放前確保數值已根據當前星技品質更新
+            UpdateStatsBasedOnRank();
             await CardCmd.AutoPlay(choiceContext, this, player.Creature);
         }
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        // 再次確保數值正確（預防動態等級變動）
         UpdateStatsBasedOnRank();
 
         // 1. 獲得格擋
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, cardPlay);
 
-        // 2. 施加忍耐能力
-        // [修正] 安全地讀取 DynamicVar "M"
-        var resistVar = DynamicVars["M"];
-        int finalResist = resistVar != null ? (int)resistVar.BaseValue : (int)BaseResist;
-
+        // 2. 施加忍耐能力 (RuinancePower)
+        int finalResist = (int)DynamicVars[MVarKey].BaseValue;
         await PowerCmd.Apply<RuinancePower>(Owner.Creature, finalResist, Owner.Creature, this);
-    }
-
-    protected override void OnUpgrade()
-    {
-        if (DynamicVars?.Block != null)
-        {
-            DynamicVars.Block.UpgradeValueBy(UpgradeBlock);
-        }
-        UpdateStatsBasedOnRank();
     }
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips => [

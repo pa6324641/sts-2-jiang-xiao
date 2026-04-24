@@ -47,4 +47,8 @@ public static class JiangXiaoModKeywords
     [CustomEnum] [KeywordProperties(AutoKeywordPosition.After)]
     public static CardKeyword JiangXiaoModCOMBATKNIFE;
     public static bool IsJiangXiaoModCOMBATKNIFE(this CardModel card) => card.CanonicalKeywords.Contains(JiangXiaoModCOMBATKNIFE);
+
+    [CustomEnum] [KeywordProperties(AutoKeywordPosition.After)]
+    public static CardKeyword JiangXiaoModBASICARTS;
+    public static bool IsJiangXiaoModBASICARTS(this CardModel card) => card.CanonicalKeywords.Contains(JiangXiaoModBASICARTS);
 }

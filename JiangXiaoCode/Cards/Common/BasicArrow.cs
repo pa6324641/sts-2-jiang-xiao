@@ -13,84 +13,88 @@ using MegaCrit.Sts2.Core.ValueProps;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using JiangXiaoMod.Code.Character;
 using BaseLib.Utils;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
+using JiangXiaoMod.Code.Cards.CardModels;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace JiangXiaoMod.Code.Cards.Common;
 
-
 [Pool(typeof(JiangXiaoCardPool))]
-public class BasicArrow : CustomCardModel
+public sealed class BasicArrow : JiangXiaoCardModel
 {
+    // [優化] 定義 CardId 確保與 localization (cards.json) 匹配
+    public const string CardId = "JIANGXIAOMOD-BASIC_ARROW";
+    // public const string M = "M";
+
     public BasicArrow() : base(2, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy)
     {        
+        // ID 會自動關聯，基類會處理 PortraitPath
+        JJKeywordAndTip(JiangXiaoModKeywords.JiangXiaoModBOW);
+        JJCustomVar("M", 1m);
+        JJDamage(2m,ValueProp.Move);
     }
 
-    public override HashSet<CardKeyword> CanonicalKeywords => [JiangXiaoModKeywords.JiangXiaoModBOW];
+    // [優化] 關鍵字定義
+    // public override HashSet<CardKeyword> CanonicalKeywords => [JiangXiaoModKeywords.JiangXiaoModBOW];
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new DamageVar(2m, ValueProp.Move), // 基礎值 2，Rank 1 時為 2 + (1*2) = 4
-        new DynamicVar("M", 1m)           // 搜尋並抽取 1 張牌
-    ];
-
-    public override Task BeforeCombatStart()
-    {
-        UpdateStatsBasedOnRank();
-        return base.BeforeCombatStart();
-    }
+    // protected override IEnumerable<DynamicVar> CanonicalVars => [
+    //     new DamageVar(2m, ValueProp.Move), // 初始基礎傷害 2
+    //     new DynamicVar("M", 1m)           // 抽牌數量
+    // ];
 
     /// <summary>
-    /// 根據弓箭等級更新傷害數值
+    /// 根據「弓箭技藝」等級更新傷害。
+    /// 提示：JiangXiaoCardModel 會在 OnCheckStats 時自動呼叫此方法，無需在 BeforeCombatStart 手動觸發。
     /// </summary>
-    private void UpdateStatsBasedOnRank()
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
-        // [STS2_Optimization] 呼叫工具類獲取當前弓箭等級 (JiangXiaoUtils 需包含 GetBowRank 方法)
-        int rank = JiangXiaoUtils.GetBowRank(Owner);
+        // 獲取特定的弓箭等級 (BasicArtsRelic)
+        int bowRank = JiangXiaoUtils.GetBowRank(player);
         
-        // 邏輯：4點傷害 + 每Rank增加2點 (起始 Rank 1 則為 4)
-        // 此處設定為 2 + (rank * 2)
-        DynamicVars.Damage.BaseValue = 2m + (rank * 2m);
+        // 邏輯：基礎 2 + (弓箭等級 * 2)。若等級 1，傷害為 4；等級 2，傷害為 6。
+        // [注意] 升級加成會由 UpgradeValue 另行累加，此處僅處理基礎縮放
+        DynamicVars.Damage.BaseValue = 2m + (bowRank * 2m);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        // 1. 確保數值最新
-        UpdateStatsBasedOnRank();
-        ArgumentNullException.ThrowIfNull(cardPlay.Target);
+        // 1. 參數檢查
+        if (cardPlay.Target == null) return;
 
         // 2. 執行攻擊動作
+        // 使用 "vfx/vfx_arrow_impact" (如果有) 或通用遠程 VFX
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
             .Targeting(cardPlay.Target)
-            .WithHitFx("vfx/vfx_attack_slash") 
+            .WithHitFx("vfx/vfx_attack_slash") // STS2 目前建議先用通用，未來可換成 arrow 類
             .Execute(choiceContext);
 
         // 3. 定向抽牌邏輯
         var player = this.Owner;
-        // 使用 player.PlayerCombatState 獲取戰鬥狀態是正確的
         var combatState = player?.PlayerCombatState;
 
         if (combatState != null)
         {
             var drawPile = combatState.DrawPile;
 
-            // [邏輯修正] 直接尋找抽牌堆中「第一張」具有 JiangXiaoModBOW 關鍵字的牌
-            // 我們不需要判斷「這張卡是否在抽牌堆」，因為我們要抽的是「其他」箭矢或弓類牌
+            // [邏輯優化] 尋找抽牌堆中「第一張」具有弓類關鍵字的牌
+            // 排除自身（雖然攻擊後通常已在 PlayContainer，但排除是好習慣）
             var targetCard = drawPile.Cards.FirstOrDefault(c => 
-                c.CanonicalKeywords.Contains(JiangXiaoModKeywords.JiangXiaoModBOW));
+                c != this && c.CanonicalKeywords.Contains(JiangXiaoModKeywords.JiangXiaoModBOW));
 
             if (targetCard != null)
             {
-                // [STS2_API] 使用 CardPileCmd.Add 移至手牌
-                // 根據手冊，這會自動從原牌堆（抽牌堆）移除並播放移動動畫
+                // [STS2_API] 將卡牌從抽牌堆移動到手牌
+                // 這會自動觸發相關 Hook 並處理 UI 動畫
                 await CardPileCmd.Add(targetCard, PileType.Hand, CardPilePosition.Top, this);
             }
         }
     }
+
     protected override void OnUpgrade()
     {
-        // 升級建議：基礎值提升
-        DynamicVars.Damage.UpgradeValueBy(2m);
+        // 升級效果：傷害基礎提升 4，耗能降低 1
+        DynamicVars.Damage.UpgradeValueBy(4m);
         EnergyCost.UpgradeBy(-1);
     }
 }

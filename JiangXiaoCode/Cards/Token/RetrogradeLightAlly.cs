@@ -9,6 +9,8 @@ using JiangXiaoMod.Code.Cards.CardModels;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using MegaCrit.Sts2.Core.Entities.Players;
+using JiangXiaoMod.Code.Extensions;
 
 namespace JiangXiaoMod.Code.Cards.Token;
 
@@ -16,6 +18,7 @@ namespace JiangXiaoMod.Code.Cards.Token;
 public class RetrogradeLightAlly : JiangXiaoCardModel
 {
     public const string CardId = "RetrogradeLightAlly";
+    public override string PortraitPath => $"retrograde_light.png".CardImagePath();
 
     // [Fix CS1061] TargetType 不含 Ally。STS2 中單體友方通常使用 TargetType.Self 
     // 若要指定隊友，建議設為 Self 並在 OnPlay 內邏輯處理，或確認是否有 SingleAlly 
@@ -42,5 +45,9 @@ public class RetrogradeLightAlly : JiangXiaoCardModel
             target.SetCurrentHpInternal(averageHp);
         }
         await Task.CompletedTask;
+    }
+    protected override void ApplyRankLogic(Player? player, int skillRank)
+    {
+        
     }
 }

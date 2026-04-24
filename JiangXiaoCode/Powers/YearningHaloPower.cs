@@ -16,7 +16,7 @@ using MegaCrit.Sts2.Core.Commands.Builders;
 
 namespace JiangXiaoMod.Code.Powers;
 
-public class YearningHaloPower : CustomPowerModel
+public class YearningHaloPower : JiangXiaoPowerModel
 {
     public const string PowerId = "YearningHaloPower";
     private const string VarM = "M";

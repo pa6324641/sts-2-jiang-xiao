@@ -16,11 +16,13 @@ using JiangXiaoMod.Code.Keywords;
 using BaseLib.Utils;
 using JiangXiaoMod.Code.Character;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using JiangXiaoMod.Code.Cards.CardModels;
+using MegaCrit.Sts2.Core.Entities.Players;
 
 namespace JiangXiaoMod.Code.Cards.Basic;
 
 [Pool(typeof(JiangXiaoCardPool))]
-public sealed class StrikeJiangXiao : CustomCardModel
+public sealed class StrikeJiangXiao : JiangXiaoCardModel
 {
     private const decimal BaseDmg = 6m;
     private const decimal UpgradeDmg = 3m;
@@ -29,48 +31,29 @@ public sealed class StrikeJiangXiao : CustomCardModel
     // 構造函數保持純淨，只定義基礎屬性
     public StrikeJiangXiao() : base(1, CardType.Attack, CardRarity.Basic, TargetType.AnyEnemy)
     {
+        JJTag(CardTag.Strike);
+        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        JJDamage(BaseDmg, ValueProp.Move);
     }
 
-    protected override HashSet<CardTag> CanonicalTags => [CardTag.Strike];
-    public override HashSet<CardKeyword> CanonicalKeywords => [JiangXiaoModKeywords.Star];
+    // protected override HashSet<CardTag> CanonicalTags => [CardTag.Strike];
+    // public override HashSet<CardKeyword> CanonicalKeywords => [JiangXiaoModKeywords.Star];
     
     // 這裡定義的 6m 是最基礎的顯示數值
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(BaseDmg, ValueProp.Move)];
+    // protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(BaseDmg, ValueProp.Move)];
     
-    public override string PortraitPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".CardImagePath();
-
     /// <summary>
     /// 核心邏輯：計算當前品質等級並修改基礎值
     /// </summary>
-    public void UpdateStatsBasedOnRank()
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
         // 安全檢查：確保 DynamicVars 已經被系統初始化
         if (DynamicVars?.Damage == null) return;
 
-        int rank = JiangXiaoUtils.GetSkillRank(Owner);
+        // int rank = JiangXiaoUtils.GetSkillRank(Owner);
         decimal currentBase = IsUpgraded ? (BaseDmg + UpgradeDmg) : BaseDmg;
         
-        DynamicVars.Damage.BaseValue = currentBase + (rank - 1) * RankBonus;
-    }
-
-    // --- 在安全的生命週期勾子中執行更新 ---
-
-    public override Task BeforeCombatStart()
-    {
-        UpdateStatsBasedOnRank();
-        return base.BeforeCombatStart();
-    }
-
-    public override Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
-    {
-        if (card == this) UpdateStatsBasedOnRank();
-        return base.AfterCardChangedPiles(card, oldPileType, source);
-    }
-
-    public override Task AfterCardDrawn(PlayerChoiceContext choiceContext, CardModel card, bool fromHandDraw)
-    {
-        if (card == this) UpdateStatsBasedOnRank();
-        return base.AfterCardDrawn(choiceContext, card, fromHandDraw);
+        DynamicVars.Damage.BaseValue = currentBase + (skillRank - 1) * RankBonus;
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

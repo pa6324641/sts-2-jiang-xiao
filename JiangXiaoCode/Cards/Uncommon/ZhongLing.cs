@@ -5,116 +5,118 @@ using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
-using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using JiangXiaoMod.Code.Relics;
-using JiangXiaoMod.Code.Powers; 
 using BaseLib.Abstracts;
 using BaseLib.Utils;
-using JiangXiaoMod.Code.Character;
-using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures; // 確保引用了生物實體命名空間
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.HoverTips;
-using JiangXiaoMod.Code.Keywords;
-using JiangXiaoMod.Code.Cards.Common;
-using JiangXiaoMod.Code.Cards.Uncommon;
+using JiangXiaoMod.Code.Cards.CardModels;
 using JiangXiaoMod.Code.Cards.Rare;
+using JiangXiaoMod.Code.Character;
+using JiangXiaoMod.Code.Extensions;
+using JiangXiaoMod.Code.Keywords;
+using JiangXiaoMod.Code.Powers;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Runs;
 
 namespace JiangXiaoMod.Code.Cards.Uncommon;
 
 [Pool(typeof(JiangXiaoCardPool))]
-public class ZhongLing : CustomCardModel
+public class ZhongLing : JiangXiaoCardModel
 {
+    // 定義變數標籤
     private const string VarHeal = "Heal";
     private const string VarHits = "Magic";
 
     public ZhongLing() : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.None)
     {
+        // [STS2_Optimization] 使用基類輔助方法初始化
+        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        
+        // 初始數值設定 (對應 1 級星技)
+        JJCustomVar(VarHeal, 6m);
+        JJCustomVar(VarHits, 4m);
     }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars
-    {
-        get
-        {
-            yield return new DynamicVar(VarHeal, IsUpgraded ? 9m : 6m);
-            yield return new DynamicVar(VarHits, IsUpgraded ? 5m : 4m);
-        }
-    }
+    // 懸浮提示：承印
     protected override IEnumerable<IHoverTip> ExtraHoverTips => [
-        HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star),
         HoverTipFactory.FromCard<ChengYin>()
     ];
 
     protected override void OnUpgrade()
     {
-        DynamicVars[VarHits].UpgradeValueBy(3m);
-        DynamicVars[VarHeal].UpgradeValueBy(1m);
+        // 費用 2 -> 1
         EnergyCost.UpgradeBy(-1);
-        GetBattleHeal();
-        GetBattleHits();
+        // 升級後重新計算基於等級的數值
+        UpdateStatsBasedOnRank(); 
     }
 
-    private decimal GetBattleHeal()
+    /// <summary>
+    /// 核心數值縮放邏輯：當星技等級改變時觸發
+    /// </summary>
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
-        decimal val = IsUpgraded ? 9m : 6m;
-        var player = RunManager.Instance?.DebugOnlyGetState()?.Players?.FirstOrDefault();
-        if (player != null)
-        {
-            var relic = player.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-            val += ((relic?.SkillRank ?? 1) - 1) * 3m;
-        }
-        return val;
-    }
+        // 1. 計算基礎值 (處理升級與未升級的區分)
+        decimal baseHeal = IsUpgraded ? 9m : 6m;
+        decimal baseHits = IsUpgraded ? 5m : 4m;
 
-    private int GetBattleHits()
-    {
-        decimal val = IsUpgraded ? 5m : 4m;
-        var player = RunManager.Instance?.DebugOnlyGetState()?.Players?.FirstOrDefault();
-        if (player != null)
-        {
-            var relic = player.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-            val += ((relic?.SkillRank ?? 1) - 1) * 1m;
-        }
-        return (int)val;
+        // 2. 根據等級縮放 (每級提升：治療+3, 次數+1)
+        int rankBonus = Math.Max(0, skillRank - 1);
+        decimal finalHeal = baseHeal + (rankBonus * 3m);
+        decimal finalHits = baseHits + (rankBonus * 1m);
+
+        // 3. 更新 DynamicVars，確保 UI 描述同步
+        if (DynamicVars.TryGetValue(VarHeal, out var hVar)) hVar.BaseValue = finalHeal;
+        if (DynamicVars.TryGetValue(VarHits, out var mVar)) mVar.BaseValue = finalHits;
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         var combat = CombatState;
-        var runState = RunManager.Instance?.DebugOnlyGetState();
-        if (combat == null || runState == null) return;
+        if (combat == null) return;
 
-        decimal finalHeal = GetBattleHeal();
-        int finalHits = GetBattleHits();
+        // 1. 獲取數值 (這部分邏輯保持優化後的，確保等級縮放有效)
+        decimal healAmt = DynamicVars.TryGetValue(VarHeal, out var hV) ? hV.PreviewValue : 6m;
+        int hitCount = (int)(DynamicVars.TryGetValue(VarHits, out var mV) ? mV.PreviewValue : 4);
 
-        // 1. 先篩選帶有《承印》能力的盟友
-        var targets = combat.Allies
-            .Where(creature => creature.Powers.Any(p => p is ChengYinPower))
+        // 2. 目標篩選
+        var alliesWithChengYin = combat.Allies
+            .Where(c => c.Powers.Any(p => p is ChengYinPower))
             .ToList();
+        
+        var finalPool = alliesWithChengYin.Any() 
+            ? alliesWithChengYin.Cast<Creature>().ToList() 
+            : combat.Allies.Concat(combat.Enemies).Cast<Creature>().ToList();
 
-        // 2. 邏輯判斷：如果沒有承印目標，則將目標範圍擴大到全體（盟友 + 敵人）
-        if (targets.Count == 0)
+        if (finalPool.Count == 0) return;
+
+        // 1. 獲取狀態 (使用 ? 確保安全)
+        var runState = RunManager.Instance.DebugOnlyGetState();
+
+        // 2. 進行安全檢查：如果狀態或 RNG 序列不存在，則中斷執行
+        if (runState?.Rng?.CombatTargets == null)
         {
-            // 使用 Concat 合併列表以確保包含所有人，這是最保險的 STS2 寫法
-            targets = combat.Allies.Concat<Creature>(combat.Enemies).ToList();
+            // 這通常不會發生在戰鬥中，但加上檢查可以消除編譯錯誤 CS8602
+            return; 
         }
-
-        if (targets.Count == 0) return;
-
+        // 3. 此時編譯器知道 rng 一定不為 null
         var rng = runState.Rng.CombatTargets;
 
-        for (int i = 0; i < finalHits; i++)
+        // 4. 執行多次隨機治療
+        for (int i = 0; i < hitCount; i++)
         {
-            // 每次循環隨機挑選一個目標
-            int randomIndex = rng.NextInt(targets.Count);
-            var randomTarget = targets[randomIndex];
+            var target = finalPool[rng.NextInt(finalPool.Count)];
 
-            // --- 修正重點 ---
-            // 直接 await Task，不要調用 .Execute()
-            await CreatureCmd.Heal(randomTarget, finalHeal, true);
-            
-            await Task.Delay(60);
+            // 執行治療動作，showEffect 為 true 會產生視覺特效
+            await CreatureCmd.Heal(target, healAmt, true);
+
+            // 視覺間隔
+            if (hitCount > 1 && i < hitCount - 1)
+            {
+                await Task.Delay(100);
+            }
         }
     }
 }

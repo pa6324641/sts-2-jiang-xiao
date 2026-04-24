@@ -77,8 +77,8 @@
         </Reference>
 
         <PackageReference Include="Alchyr.Sts2.BaseLib" Version="3.0.3" PrivateAssets="All" />
-        <PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="0.0.9"/>
-        <AdditionalFiles Include="JiangXiao/localization/**/*.json"/>
+        <PackageReference Include="Alchyr.Sts2.ModAnalyzers" Version="0.0.9" />
+        <AdditionalFiles Include="JiangXiao/localization/**/*.json" />
     </ItemGroup>
 
     <!--<ItemGroup>
@@ -89,10 +89,10 @@
     </ItemGroup> -->
 
     <ItemGroup>
-        <None Include=".gitignore"/>
-        <None Include="JiangXiao.json"/>
-        <None Include="project.godot"/>
-        <None Include="JiangXiao/**"/>
+        <None Include=".gitignore" />
+        <None Include="JiangXiao.json" />
+        <None Include="project.godot" />
+        <None Include="JiangXiao/**" />
 		<None Include="**/*.tscn" />
 		<None Include="**/*.tres" />
     </ItemGroup>
@@ -103,41 +103,37 @@
 
     <ItemGroup>
         <!--<Content Include="images\ui\top_panel\character_icon_JiangXiao2_outline.png"/>-->
-        <Content Include="images\ui\top_panel\character_icon_JiangXiao2.png"/>
-        <Content Include="images\ui\top_panel\character_icon_JiangXiao2.png.import"/>
+        <Content Include="images\ui\top_panel\character_icon_JiangXiao2.png" />
+        <Content Include="images\ui\top_panel\character_icon_JiangXiao2.png.import" />
     </ItemGroup>
 
 
 	<Target Name="CopyToModsFolderOnBuild" AfterTargets="PostBuildEvent">
-        <Message Text="正在複製 .dll 和 manifest 檔案到 mods 文件夾..." Importance="high"/>
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/"/>
-        <Copy SourceFiles="JiangXiao.json" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/"/>
+        <Message Text="正在複製 .dll 和 manifest 檔案到 mods 文件夾..." Importance="high" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
+        <Copy SourceFiles="JiangXiao.json" DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
         
-        <Message Text="正在複製 BaseLib 3.0.3 到 mods 文件夾..." Importance="high"/>
+        <Message Text="正在複製 BaseLib 3.0.3 到 mods 文件夾..." Importance="high" />
         <ItemGroup>
-            <BaseLibFiles Include="$(NuGetPackageRoot)alchyr.sts2.baselib/3.0.3/lib/net9.0/BaseLib.dll;
-                                 $(NuGetPackageRoot)alchyr.sts2.baselib/3.0.3/Content/BaseLib.pck;
-                                 $(NuGetPackageRoot)alchyr.sts2.baselib/3.0.3/Content/BaseLib.json;"/>
+            <BaseLibFiles Include="$(NuGetPackageRoot)alchyr.sts2.baselib/3.0.3/lib/net9.0/BaseLib.dll;&#xA;                                 $(NuGetPackageRoot)alchyr.sts2.baselib/3.0.3/Content/BaseLib.pck;&#xA;                                 $(NuGetPackageRoot)alchyr.sts2.baselib/3.0.3/Content/BaseLib.json;" />
         </ItemGroup>
-        <Copy SourceFiles="@(BaseLibFiles)" DestinationFolder="$(ModsPath)BaseLib/"/>
+        <Copy SourceFiles="@(BaseLibFiles)" DestinationFolder="$(ModsPath)BaseLib/" />
     </Target>
 
     <Target Name="GodotPublish" AfterTargets="Publish" Condition="'$(GodotPath)' != '' and Exists('$(GodotPath)') and '$(IsInnerGodotExport)' != 'true'">
-        <Message Text="Exporting Godot .pck to mods folder" Importance="high"/>
+        <Message Text="Exporting Godot .pck to mods folder" Importance="high" />
 
-        <Exec Command="&quot;$(GodotPath)&quot; --headless --export-pack &quot;BasicExport&quot; &quot;$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck&quot;"
-              EnvironmentVariables="IsInnerGodotExport=true;MSBUILDDISABLENODEREUSE=1"
-              ContinueOnError="WarnAndContinue"/>
+        <Exec Command="&quot;$(GodotPath)&quot; --headless --export-pack &quot;BasicExport&quot; &quot;$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck&quot;" EnvironmentVariables="IsInnerGodotExport=true;MSBUILDDISABLENODEREUSE=1" ContinueOnError="WarnAndContinue" />
     </Target>
 
     <Target Name="GodotPublishSkipped" AfterTargets="Publish" Condition="'$(GodotPath)' == '' or !Exists('$(GodotPath)')">
-        <Message Text="Skipping Godot .pck export because GodotPath is not configured." Importance="high"/>
+        <Message Text="Skipping Godot .pck export because GodotPath is not configured." Importance="high" />
     </Target>
 
 
     <!-- ── Release packaging ───────────────────────────────────────── -->
     <Target Name="CreateReleaseZip" AfterTargets="GodotPublish" Condition="'$(ReleaseVersion)' != ''">
-        <Message Text="Packaging release $(ReleaseVersion)..." Importance="high"/>
+        <Message Text="Packaging release $(ReleaseVersion)..." Importance="high" />
 
         <PropertyGroup>
             <ZipName>JiangXiao-release-$(ReleaseVersion).zip</ZipName>
@@ -145,35 +141,35 @@
         </PropertyGroup>
 
         <!-- Create temp folder structure -->
-        <MakeDir Directories="$(TempReleaseDir)\JiangXiao"/>
-        <MakeDir Directories="$(TempReleaseDir)\BaseLib"/>
+        <MakeDir Directories="$(TempReleaseDir)\JiangXiao" />
+        <MakeDir Directories="$(TempReleaseDir)\BaseLib" />
 
         <!-- Copy JiangXiao files -->
-        <Copy SourceFiles="$(ModsPath)JiangXiao\JiangXiao.dll" DestinationFolder="$(TempReleaseDir)\JiangXiao\"/>
-        <Copy SourceFiles="$(ModsPath)JiangXiao\JiangXiao.pck" DestinationFolder="$(TempReleaseDir)\JiangXiao\"/>
-        <Copy SourceFiles="$(ModsPath)JiangXiao\JiangXiao.json" DestinationFolder="$(TempReleaseDir)\JiangXiao\"/>
+        <Copy SourceFiles="$(ModsPath)JiangXiao\JiangXiao.dll" DestinationFolder="$(TempReleaseDir)\JiangXiao\" />
+        <Copy SourceFiles="$(ModsPath)JiangXiao\JiangXiao.pck" DestinationFolder="$(TempReleaseDir)\JiangXiao\" />
+        <Copy SourceFiles="$(ModsPath)JiangXiao\JiangXiao.json" DestinationFolder="$(TempReleaseDir)\JiangXiao\" />
 
         <!-- Copy BaseLib files -->
-        <Copy SourceFiles="$(ModsPath)BaseLib\BaseLib.dll" DestinationFolder="$(TempReleaseDir)\BaseLib\"/>
-        <Copy SourceFiles="$(ModsPath)BaseLib\BaseLib.pck" DestinationFolder="$(TempReleaseDir)\BaseLib\"/>
-        <Copy SourceFiles="$(ModsPath)BaseLib\BaseLib.json" DestinationFolder="$(TempReleaseDir)\BaseLib\"/>
+        <Copy SourceFiles="$(ModsPath)BaseLib\BaseLib.dll" DestinationFolder="$(TempReleaseDir)\BaseLib\" />
+        <Copy SourceFiles="$(ModsPath)BaseLib\BaseLib.pck" DestinationFolder="$(TempReleaseDir)\BaseLib\" />
+        <Copy SourceFiles="$(ModsPath)BaseLib\BaseLib.json" DestinationFolder="$(TempReleaseDir)\BaseLib\" />
 
         <!-- Create zip using PowerShell -->
-        <Exec Command="powershell -Command &quot;Compress-Archive -Path '$(TempReleaseDir)\*' -DestinationPath '$(MSBuildProjectDirectory)\$(ZipName)' -Force&quot;"/>
+        <Exec Command="powershell -Command &quot;Compress-Archive -Path '$(TempReleaseDir)\*' -DestinationPath '$(MSBuildProjectDirectory)\$(ZipName)' -Force&quot;" />
 
         <!-- Cleanup temp folder -->
-        <RemoveDir Directories="$(TempReleaseDir)"/>
+        <RemoveDir Directories="$(TempReleaseDir)" />
 
-        <Message Text="Created $(ZipName)" Importance="high"/>
+        <Message Text="Created $(ZipName)" Importance="high" />
     </Target>
 
     <Target Name="CreateGitHubRelease" AfterTargets="CreateReleaseZip" Condition="'$(ReleaseVersion)' != ''">
-        <Message Text="Tagging and publishing GitHub release $(ReleaseVersion)..." Importance="high"/>
+        <Message Text="Tagging and publishing GitHub release $(ReleaseVersion)..." Importance="high" />
 
-        <Exec Command="git tag $(ReleaseVersion)"/>
-        <Exec Command="git push origin $(ReleaseVersion)"/>
-        <Exec Command="gh release create $(ReleaseVersion) &quot;$(MSBuildProjectDirectory)\JiangXiao-release-$(ReleaseVersion).zip&quot; --title &quot;JiangXiao $(ReleaseVersion)&quot; --generate-notes"/>
+        <Exec Command="git tag $(ReleaseVersion)" />
+        <Exec Command="git push origin $(ReleaseVersion)" />
+        <Exec Command="gh release create $(ReleaseVersion) &quot;$(MSBuildProjectDirectory)\JiangXiao-release-$(ReleaseVersion).zip&quot; --title &quot;JiangXiao $(ReleaseVersion)&quot; --generate-notes" />
 
-        <Message Text="GitHub release $(ReleaseVersion) published!" Importance="high"/>
+        <Message Text="GitHub release $(ReleaseVersion) published!" Importance="high" />
     </Target>
 </Project>

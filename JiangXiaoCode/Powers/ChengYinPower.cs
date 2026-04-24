@@ -18,14 +18,16 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace JiangXiaoMod.Code.Powers
 {
-    public class ChengYinPower : CustomPowerModel
+    public class ChengYinPower : JiangXiaoPowerModel
     {
         public const string PowerId = "ChengYinPower";
 
         public ChengYinPower() : base() { }
 
         public override PowerType Type => PowerType.Buff;
+        private const string RegenAmt = "RegenAmt";
         public override PowerStackType StackType => PowerStackType.None;
+        
 
         // 【修復顯示 0 的核心邏輯】
         public int GetCurrentRegenAmount()
@@ -45,7 +47,7 @@ namespace JiangXiaoMod.Code.Powers
             get
             {
                 // 使用函數獲取數值，確保渲染時不會因為 Amount 暫時為 0 而顯示錯誤
-                yield return new DynamicVar("RegenAmt", (decimal)GetCurrentRegenAmount());
+                yield return new DynamicVar(RegenAmt, (decimal)GetCurrentRegenAmount());
             }
         }
 

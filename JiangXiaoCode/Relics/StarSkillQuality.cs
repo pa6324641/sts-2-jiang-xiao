@@ -65,6 +65,7 @@ public sealed class StarSkillQuality : CustomRelicModel
             return 0;
         }
     }
+    
 
     public QualityRank GetRank()
     {

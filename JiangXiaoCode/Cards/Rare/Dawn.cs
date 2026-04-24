@@ -14,40 +14,32 @@ using JiangXiaoMod.Code.Relics;
 using JiangXiaoMod.Code.Keywords;
 using JiangXiaoMod.Code.Extensions;
 using BaseLib.Utils;
-using JiangXiaoMod.Code.Character; // 確保引用了 JiangXiaoUtils 所在的命名空間
+using JiangXiaoMod.Code.Character;
+using JiangXiaoMod.Code.Cards.CardModels;
+using MegaCrit.Sts2.Core.Entities.Players;
 
 namespace JiangXiaoMod.Code.Cards.Rare;
 
 [Pool(typeof(JiangXiaoCardPool))]
-// [STS2_Optimization] 1. 使用 Primary Constructor 風格，並將 TargetType 改為 AllAllies
-// 這樣 UI 會正確顯示「全體隊友」選取效果，不再是「多此一舉」的手動選取。
-public sealed class Dawn() : CustomCardModel(0, CardType.Power, CardRarity.Rare, TargetType.AllAllies)
+public sealed class Dawn : JiangXiaoCardModel
 {
+    public const string CardId = "JIANGXIAOMOD-DAWN";
     private const string VarM = "M";
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new BlockVar(8m, ValueProp.Move), // 這裡建議確認 ValueProp 是否需為 Move，一般格擋用 None
-        new DynamicVar(VarM, 1m)
-    ];
-
-    protected override IEnumerable<IHoverTip> ExtraHoverTips => [
-        HoverTipFactory.FromKeyword(JiangXiaoModKeywords.Star),
-        HoverTipFactory.Static(StaticHoverTip.Block),
-        HoverTipFactory.FromPower<DawnPower>()
-    ];
-
-    public override Task BeforeCombatStart()
+    public Dawn() : base(0, CardType.Power, CardRarity.Rare, TargetType.AllAllies)
     {
-        UpdateStatsBasedOnRank();
-        return base.BeforeCombatStart();
+        // [STS2_Correction] 使用 ValueProp.None 或 Move 均可，BlockVar 本身是強類型
+        JJVar(new BlockVar(8m, ValueProp.Move));
+        JJCustomVar(VarM, 1m);
+
+        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        JJPowerTip<DawnPower>();
+        JJStaticTip(StaticHoverTip.Block);
     }
 
-    private void UpdateStatsBasedOnRank()
+    protected override void ApplyRankLogic(Player? player, int skillRank)
     {
-        // [冗餘消除] 3. 直接使用你寫好的工具類，維護更方便
-        int rank = JiangXiaoUtils.GetSkillRank(Owner);
-        
-        decimal calculatedM = rank switch
+        decimal calculatedM = skillRank switch
         {
             <= 2 => 1m,
             <= 4 => 2m,
@@ -59,6 +51,8 @@ public sealed class Dawn() : CustomCardModel(0, CardType.Power, CardRarity.Rare,
             calculatedM += 1m;
         }
 
+        // [Fix_CS1061] 直接透過索引器更新數值，這是 STS2 最穩定的做法
+        // 只要構造函數有定義過 VarM，此處就不會報錯
         DynamicVars[VarM].BaseValue = calculatedM;
     }
 
@@ -67,28 +61,24 @@ public sealed class Dawn() : CustomCardModel(0, CardType.Power, CardRarity.Rare,
         var combat = CombatState;
         if (combat == null) return;
 
-        // 確保打出時數值是最新的（特別是某些即時獲得的遺物影響）
         UpdateStatsBasedOnRank();
 
-        // 這裡的 Allies 包含玩家自己與所有隊友/召喚物
         var targets = combat.Allies;
-        decimal drawAmount = DynamicVars[VarM].BaseValue;
+        decimal mValue = DynamicVars[VarM].BaseValue;
 
-        // 4. 給予所有人格擋
-        // 在 STS2 中，CreatureCmd.GainBlock 目前仍建議對每個實體分別調用
+        // [Fix_CS1503] 傳遞整個 BlockVar 對象 (DynamicVars.Block)
+        // 這樣 STS2 的渲染引擎才能追蹤到這格擋是由這張卡牌產生的
         foreach (var target in targets)
         {
             await CreatureCmd.GainBlock(target, DynamicVars.Block, cardPlay);
         }
 
-        // 5. 施加曙光能力 (PowerCmd.Apply 本身支援傳入 IEnumerable<Creature>)
-        // 這裡傳入的 drawAmount 會成為 DawnPower 的 Amount 屬性
-        await PowerCmd.Apply<DawnPower>(targets, drawAmount, Owner.Creature, this);
+        // 施加能力
+        await PowerCmd.Apply<DawnPower>(targets, mValue, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()
     {
-        // 只處理基礎數值升級，動態變量 M 的升級邏輯已統一在 UpdateStatsBasedOnRank 中
         DynamicVars.Block.UpgradeValueBy(3m);
     }
 }

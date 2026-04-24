@@ -1,120 +1,114 @@
 using BaseLib.Abstracts;
 using Godot;
+using JiangXiaoMod.Code.Extensions;
 using JiangXiaoMod.Code.Relics;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Cards;
-using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Random; 
 using MegaCrit.Sts2.Core.ValueProps;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq; // 必須新增，用於 FirstOrDefault
 using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace JiangXiaoMod.Code.Powers;
 
-public class ResentmentPower : CustomPowerModel
+/// <summary>
+/// 怨氣能力：受傷時機率對敵人施加隨機負面效果。
+/// 已修正 DynamicVar 渲染邏輯，確保在 UI 預覽時也能正確顯示數值。
+/// </summary>
+public class ResentmentPower : JiangXiaoPowerModel
 {
     public const string PowerId = "RESENTMENT_POWER";
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.None;
     
-    // [STS2_Fix] 統一使用同一個 Key
-    private const string _mKey = "MVar"; 
+    private const string VarM = "M"; 
 
-    public ResentmentPower()
+    public ResentmentPower() : base()
     {
     }
 
-    // [STS2_BestPractice] 僅定義結構，不要在此執行計算
+    // [STS2_Optimization] 建立一個健壯的等級獲取邏輯
+    private int GetCurrentSkillRank()
+    {
+        // 優先從擁有者獲取，若在 UI 預覽/圖鑑中，則從全域 RunManager 獲取
+        var player = Owner?.Player ?? RunManager.Instance?.DebugOnlyGetState()?.Players.FirstOrDefault();
+        return JiangXiaoUtils.GetSkillRank(player);
+    }
+
+    private int CalculateTriggerChance()
+    {
+        int rank = GetCurrentSkillRank();
+        return 30 + (rank * 10);
+    }
+
     protected override IEnumerable<DynamicVar> CanonicalVars
     {
         get
         {
-            // 將計算好的值拋給 STS2 的 SmartFormat 系統渲染
-            yield return new DynamicVar(_mKey, (decimal)UpdatePowerStats());
+            // 將計算好的數值以 decimal 形式交給 SmartFormat 系統渲染
+            yield return new DynamicVar(VarM, (decimal)CalculateTriggerChance());
         }
-    }
-
-    // 當戰鬥加載或重新讀取時，更新數值
-    public override Task BeforeCombatStart()
-    {
-        UpdatePowerStats();
-        return base.BeforeCombatStart();
-    }
-
-    // [STS2_Update] 專門負責計算數值的函數
-    public int UpdatePowerStats()
-    {
-        int rankLevel = 1;
-        
-        // 【STS2 獨特處理】
-        // 當能力顯示在 UI (CanonicalVars) 時，Owner 可能尚未完全綁定到 Creature 身上。
-        // 因此我們優先嘗試從 Owner 拿，如果拿不到，就從全域的 RunManager 獲取當前玩家狀態。
-        var player = Owner?.Player ?? RunManager.Instance?.DebugOnlyGetState()?.Players.FirstOrDefault();
-
-        if (player?.Relics != null)
-        {
-            var relic = player.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-            if (relic != null)
-            {
-                // 注意：如果你遺物裡的屬性是 SkillRank，這裡可以改為 (int)relic.SkillRank
-                rankLevel = (int)relic.GetRank(); 
-            }
-        }
-        return 30 + (rankLevel *10);
     }
 
     public override async Task AfterDamageReceived(PlayerChoiceContext choiceContext, Creature target, DamageResult result, ValueProp props, Creature? dealer, CardModel? cardSource)
     {
         // 1. 安全檢查
-        if (target != Owner || dealer == null || dealer == target || result.TotalDamage < 0)
+        if (target != Owner || dealer == null || dealer == target)
         {
             return;
         }
 
-        // 每次觸發前，重新同步一次機率（防止戰鬥中遺物等級變動）
-        UpdatePowerStats();
-
-        // 2. 獲取當前機率
-        float chance = (float)DynamicVars[_mKey].BaseValue / 100f;
-
-        // 3. 隨機判定
-        if (GD.Randf() <= chance)
+        // 2. 獲取全域狀態以存取同步 RNG
+        var runState = RunManager.Instance.DebugOnlyGetState();
+        
+        // 3. 確保 RNG 序列存在
+        if (runState?.Rng?.CombatTargets == null)
         {
-            await ApplyRandomDebuff(choiceContext, dealer);
+            return;
         }
 
-        await base.AfterDamageReceivedLate(choiceContext, target, result, props, dealer, cardSource);
+        Rng rng = runState.Rng.CombatTargets;
+
+        // 4. 判定是否觸發
+        float chance = CalculateTriggerChance() / 100f;
+        if (rng.NextFloat() <= chance)
+        {
+            await ApplyRandomDebuff(choiceContext, dealer, rng);
+        }
+
+        await base.AfterDamageReceived(choiceContext, target, result, props, dealer, cardSource);
     }
 
-    private async Task ApplyRandomDebuff(PlayerChoiceContext context, Creature dealer)
+    private async Task ApplyRandomDebuff(PlayerChoiceContext context, Creature dealer, Rng rng)
     {
-        // 計算負面效果層數 (0星=2, 1星=4, 2星=6...)
-        var player = Owner?.Player ?? RunManager.Instance.DebugOnlyGetState()?.Players.FirstOrDefault();
-        var relic = player?.Relics.FirstOrDefault(r => r is StarSkillQuality) as StarSkillQuality;
-        int currentRank = relic?.SkillRank ?? 0;
+        int currentRank = GetCurrentSkillRank();
         int varAmount = (currentRank + 1) * 2;
 
-        int roll = (int)GD.RandRange(0, 8);
+        int roll = rng.NextInt(0, 7); 
+
+        Flash();
 
         switch (roll)
         {
-            case 0: await PowerCmd.Apply<WeakPower>(dealer, varAmount, Owner, null); break;
+            case 0: await PowerCmd.Apply<DexterityPower>(dealer, -varAmount, Owner, null); break; // 修正：負面效果應為負數
             case 1: await PowerCmd.Apply<VulnerablePower>(dealer, varAmount, Owner, null); break;
             case 2: await PowerCmd.Apply<FrailPower>(dealer, varAmount, Owner, null); break;
-            case 3: await PowerCmd.Apply<TheGambitPower>(dealer, 1, Owner, null); break;
-            case 4: await PowerCmd.Apply<PoisonPower>(dealer, varAmount * 4, Owner, null); break; // 毒稍微給多一點
-            case 5: await PowerCmd.Apply<DoomPower>(dealer, varAmount * 4, Owner, null); break;
-            case 6: await PowerCmd.Apply<StrengthPower>(dealer, -varAmount,Owner, null); break;
-            // case 7: await CreatureCmd.Stun(dealer); break;
-            case 7: await PowerCmd.Apply<DexterityPower>(dealer, -varAmount,Owner, null); break;
-            case 8: await PowerCmd.Apply<ShrinkPower>(dealer, varAmount,Owner, null); break;
+            case 3: await PowerCmd.Apply<ShrinkPower>(dealer, 1, Owner, null); break;
+            case 4: await PowerCmd.Apply<PoisonPower>(dealer, varAmount * 3, Owner, null); break;
+            case 5: await PowerCmd.Apply<DoomPower>(dealer, varAmount * 3, Owner, null); break;
+            case 6: await PowerCmd.Apply<StrengthPower>(dealer, -varAmount, Owner, null); break;
+            case 7: 
+            default:
+                await PowerCmd.Apply<WeakPower>(dealer, varAmount, Owner, null); 
+                break;
         }
     }
 }

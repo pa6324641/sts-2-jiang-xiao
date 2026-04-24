@@ -1,29 +1,29 @@
 {
   "JIANGXIAOMOD-RUINANCE_POWER.title": "Endurance",
-  "JIANGXIAOMOD-RUINANCE_POWER.description": "Reduces attack damage taken by [gold]{resist:diff()}[/gold].",
-  "JIANGXIAOMOD-RUINANCE_POWER.smartDescription": "Reduces attack damage taken by [gold]{resist:diff()}[/gold].",
+  "JIANGXIAOMOD-RUINANCE_POWER.description": "Reduce attack damage taken by [gold]X[/gold].",
+  "JIANGXIAOMOD-RUINANCE_POWER.smartDescription": "Reduce attack damage taken by [gold]{Amount}[/gold].",
 
-  "JIANGXIAOMOD-BEAT_BACK_POWER.title": "Beat Back",
-  "JIANGXIAOMOD-BEAT_BACK_POWER.description": "At the end of your turn, gain {Amount} lost [gold]Strength[/gold].",
-  "JIANGXIAOMOD-BEAT_BACK_POWER.smartDescription": "At the end of your turn, gain {Amount} lost [gold]Strength[/gold].",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.title": "Repel",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.description": "At the end of your turn, regain X lost [gold]Strength[/gold].",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.smartDescription": "At the end of your turn, regain {Amount} lost [gold]Strength[/gold].",
 
-  "JIANGXIAOMOD-CHENG_YIN_POWER.title": "Seal Bearer",
-  "JIANGXIAOMOD-CHENG_YIN_POWER.description": "The healing light that guides the bell.\n Whenever you take damage, gain [gold]{RegenAmt:diff()}[/gold] Regen.",
-  "JIANGXIAOMOD-CHENG_YIN_POWER.smartDescription": "The healing light that guides the bell.\n Whenever you take damage, gain [gold]{RegenAmt:diff()}[/gold] Regen.",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.title": "Seal Bearing",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.description": "Guides the Bell's healing rays.\nWhen damaged, gain [gold]X[/gold] Regeneration.",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.smartDescription": "Guides the Bell's healing rays.\nWhen damaged, gain [gold]{RegenAmt:diff()}[/gold] Regeneration.",
 
   "JIANGXIAOMOD-DAWN_POWER.title": "Dawn",
-  "JIANGXIAOMOD-DAWN_POWER.smartDescription": "Draw [gold]{M}[/gold] additional card(s) each turn. Longing always chases a glimmer of dawn.",
-  "JIANGXIAOMOD-DAWN_POWER.description": "Draw [gold]{M}[/gold] additional card(s) each turn. Longing always chases a glimmer of dawn.",
+  "JIANGXIAOMOD-DAWN_POWER.description": "Draw [gold]X[/gold] additional card(s) each turn; Yearning always chases a sliver of Dawn.",
+  "JIANGXIAOMOD-DAWN_POWER.smartDescription": "Draw [gold]{Amount}[/gold] additional card(s) each turn; Yearning always chases a sliver of Dawn.",
   
-  "JIANGXIAOMOD-YEARNING_HALO_POWER.title": "Yearning Halo",
-  "JIANGXIAOMOD-YEARNING_HALO_POWER.description": "Every attack grants [gold]{M}%[/gold] Lifesteal.",
-  "JIANGXIAOMOD-YEARNING_HALO_POWER.smartDescription": "Every attack grants [gold]{M}%[/gold] Lifesteal.",
+  "JIANGXIAOMOD-YEARNING_HALO_POWER.title": "Yearning Aura",
+  "JIANGXIAOMOD-YEARNING_HALO_POWER.description": "Every attack has [gold]X%[/gold] Lifesteal.",
+  "JIANGXIAOMOD-YEARNING_HALO_POWER.smartDescription": "Every attack has [gold]{M}%[/gold] Lifesteal.",
 
   "JIANGXIAOMOD-RESENTMENT_POWER.title": "Resentment",
-  "JIANGXIAOMOD-RESENTMENT_POWER.smartDescription": "Upon being attacked, there is a {MVar}% chance to apply a random debuff to the attacker.",
-  "JIANGXIAOMOD-RESENTMENT_POWER.description": "Upon being attacked, there is a {MVar}% chance to apply a random debuff to the attacker.",
+  "JIANGXIAOMOD-RESENTMENT_POWER.description": "When attacked, there is a [gold]X%[/gold] chance to give the attacker a random debuff.",
+  "JIANGXIAOMOD-RESENTMENT_POWER.smartDescription": "When attacked, there is a [gold]{M:diff()}%[/gold] chance to give the attacker a random debuff.",
 
-  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.title": "Tear of Sorrow",
-  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.description": "At the start of this unit's turn, lose [gold]5%[/gold] of Max HP per stack (Currently: [gold]{M}[/gold] HP).",
-  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.smartDescription": "At the start of this unit's turn, lose [gold]5%[/gold] of Max HP per stack (Currently: [gold]{M}[/gold] HP)."
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.title": "Tears of Sorrow",
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.description": "At the start of this unit's turn, lose [gold]5%[/gold] Max HP.",
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.smartDescription": "At the start of this unit's turn, lose [gold]5%[/gold] Max HP."
 }
