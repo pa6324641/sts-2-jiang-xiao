@@ -35,7 +35,7 @@ public class GodSkillStrike : JiangXiaoCardModel
 
         // 添加力量提示，方便玩家查看
         JJPowerTip<StrengthPower>();
-        JJKeywordAndTip(JiangXiaoModKeywords.JiangXiaoModBASICARTS);
+        // JJKeywordAndTip(JiangXiaoModKeywords.JiangXiaoModBASICARTS);
     }
 
     /// <summary>

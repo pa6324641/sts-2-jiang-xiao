@@ -35,12 +35,16 @@ public class XiaBladeStyleTrue : JiangXiaoCardModel
 
     // 緩存變量：紀錄是否滿足組合技條件，避免在 Modify 勾子中頻繁掃描牌組
     private bool _isSetComplete = false;
+    public const string DamageX = "X";
 
     public XiaBladeStyleTrue() : base(4, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy)
     {
         JJBlock(4m, ValueProp.Move);
         JJDamage(4m, ValueProp.Move);
         JJKeywordAndTip(JiangXiaoModKeywords.JiangXiaoModBLADE);
+        JJCustomVar(DamageX, 3m);
+
+        JJTag(CardTag.Strike);
     }
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips => [
@@ -59,7 +63,7 @@ public class XiaBladeStyleTrue : JiangXiaoCardModel
         // 1. 計算基於「刀法等級」的基礎值
         int bladeRank = JiangXiaoUtils.GetBladeRank(player);
         decimal baseVal = IsUpgraded ? 6m : 4m;
-        decimal baseCalc = baseVal + (bladeRank * 4m);
+        decimal baseCalc = baseVal + (bladeRank * 3m);
 
         // 2. 組合技掃描（掃描永久牌組 Master Deck）
         var deckCards = player.Deck.Cards;
@@ -93,7 +97,7 @@ public class XiaBladeStyleTrue : JiangXiaoCardModel
         // [安全檢查]：只有當「傷害來源」是這張卡牌本身，且達成組合技時，才翻倍
         if (cardSource == this && _isSetComplete)
         {
-            finalAmount *= 4m;
+            finalAmount *= DynamicVars[DamageX].BaseValue;
         }
 
         return finalAmount;
@@ -109,7 +113,7 @@ public class XiaBladeStyleTrue : JiangXiaoCardModel
         // [安全檢查]：只有當「格擋來源」是這張卡牌本身，且達成組合技時，才翻倍
         if (cardSource == this && _isSetComplete)
         {
-            finalBlock *= 4m;
+            finalBlock *= DynamicVars[DamageX].BaseValue;
         }
 
         return finalBlock;
@@ -137,6 +141,8 @@ public class XiaBladeStyleTrue : JiangXiaoCardModel
                 .WithHitFx("vfx/vfx_attack_slash") 
                 .Execute(choiceContext);
         }
+        
+        // await EXArt(choiceContext);
     }
 
     protected override void OnUpgrade()

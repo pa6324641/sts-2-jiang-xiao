@@ -25,6 +25,7 @@ public sealed class StarPowerLevel : CustomRelicModel
     public override RelicRarity Rarity => RelicRarity.Starter;
     private const string VarLevel = "level";
     private const string VarEnergy = "energy";
+    public int PowerLevel => GetLevel();
 
     // protected override string IconBaseName => "star_power_level";
     private static readonly FieldInfo? DynamicVarsField = typeof(RelicModel).GetField("_dynamicVars", BindingFlags.NonPublic | BindingFlags.Instance);

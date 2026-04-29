@@ -26,7 +26,7 @@ public sealed class StrikeJiangXiao : JiangXiaoCardModel
 {
     private const decimal BaseDmg = 6m;
     private const decimal UpgradeDmg = 3m;
-    private const decimal RankBonus = 3m;
+    private const decimal RankBonus = 2m;
 
     // 構造函數保持純淨，只定義基礎屬性
     public StrikeJiangXiao() : base(1, CardType.Attack, CardRarity.Basic, TargetType.AnyEnemy)

@@ -24,7 +24,7 @@ public class UnarmedStrike : JiangXiaoCardModel
 {
     // 定義常量，方便維護
     private const decimal BaseDmgValue = 3m;
-    private const decimal DmgPerRank = 3m;
+    private const decimal DmgPerRank = 1m;
     private const decimal UpgradeDmgBonus = 3m;
     // private const string Var = "M";
 
@@ -44,7 +44,7 @@ public class UnarmedStrike : JiangXiaoCardModel
         // 獲取「徒手格鬥」專用等級
         int unarmedRank = JiangXiaoUtils.GetUnarmedRank(player);
         
-        // 傷害 = 基礎(3) + 等級加成(rank * 3) + (若升級則 +3)
+        // 傷害 = 基礎(3) + 等級加成(rank * 1) + (若升級則 +3)
         decimal finalBaseDmg = BaseDmgValue + (unarmedRank * DmgPerRank);
         if (IsUpgraded)
         {
@@ -53,8 +53,8 @@ public class UnarmedStrike : JiangXiaoCardModel
         
         DynamicVars.Damage.BaseValue = finalBaseDmg;
         
-        // 抽牌邏輯：1 + (Rank / 2)
-        DynamicVars["M"].BaseValue = 1m + (unarmedRank / 2);
+        // 抽牌邏輯：1 + (Rank / 3)
+        DynamicVars["M"].BaseValue = 1m + ((unarmedRank-1) / 3);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -64,7 +64,7 @@ public class UnarmedStrike : JiangXiaoCardModel
 
         // 1. 執行攻擊動作
         // 使用 PreviewValue 以確保包含力量 (Strength) 等戰鬥內加成
-        await DamageCmd.Attack(DynamicVars.Damage.PreviewValue)
+        await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
             .Targeting(cardPlay.Target)
             .WithHitFx("vfx/vfx_attack_slash")

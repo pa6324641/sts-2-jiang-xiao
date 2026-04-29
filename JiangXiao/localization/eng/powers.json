@@ -1,29 +1,65 @@
 {
   "JIANGXIAOMOD-RUINANCE_POWER.title": "Endurance",
-  "JIANGXIAOMOD-RUINANCE_POWER.description": "Reduce attack damage taken by [gold]X[/gold].",
-  "JIANGXIAOMOD-RUINANCE_POWER.smartDescription": "Reduce attack damage taken by [gold]{Amount}[/gold].",
+  "JIANGXIAOMOD-RUINANCE_POWER.description": "Reduces attack damage taken by [gold]X[/gold].",
+  "JIANGXIAOMOD-RUINANCE_POWER.smartDescription": "Reduces attack damage taken by [gold]{Amount}[/gold].",
 
-  "JIANGXIAOMOD-BEAT_BACK_POWER.title": "Repel",
-  "JIANGXIAOMOD-BEAT_BACK_POWER.description": "At the end of your turn, regain X lost [gold]Strength[/gold].",
-  "JIANGXIAOMOD-BEAT_BACK_POWER.smartDescription": "At the end of your turn, regain {Amount} lost [gold]Strength[/gold].",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.title": "Beat Back",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.description": "At the end of your turn, gain [gold]Strength[/gold] equal to the X amount lost.",
+  "JIANGXIAOMOD-BEAT_BACK_POWER.smartDescription": "At the end of your turn, gain [gold]Strength[/gold] equal to the {Amount} lost.",
 
-  "JIANGXIAOMOD-CHENG_YIN_POWER.title": "Seal Bearing",
-  "JIANGXIAOMOD-CHENG_YIN_POWER.description": "Guides the Bell's healing rays.\nWhen damaged, gain [gold]X[/gold] Regeneration.",
-  "JIANGXIAOMOD-CHENG_YIN_POWER.smartDescription": "Guides the Bell's healing rays.\nWhen damaged, gain [gold]{RegenAmt:diff()}[/gold] Regeneration.",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.title": "Seal of Light",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.description": "Guides the healing light of the bell.\n Upon taking damage, gain [gold]X[/gold] Regen.",
+  "JIANGXIAOMOD-CHENG_YIN_POWER.smartDescription": "Guides the healing light of the bell.\n Upon taking damage, gain [gold] {RegenAmt:diff()} [/gold] Regen.",
 
   "JIANGXIAOMOD-DAWN_POWER.title": "Dawn",
-  "JIANGXIAOMOD-DAWN_POWER.description": "Draw [gold]X[/gold] additional card(s) each turn; Yearning always chases a sliver of Dawn.",
-  "JIANGXIAOMOD-DAWN_POWER.smartDescription": "Draw [gold]{Amount}[/gold] additional card(s) each turn; Yearning always chases a sliver of Dawn.",
+  "JIANGXIAOMOD-DAWN_POWER.description": "Draw [gold]X[/gold] additional cards each turn; Yearning always chases a glimmer of dawn.",
+  "JIANGXIAOMOD-DAWN_POWER.smartDescription": "Draw [gold]{Amount}[/gold] additional cards each turn; Yearning always chases a glimmer of dawn.",
   
-  "JIANGXIAOMOD-YEARNING_HALO_POWER.title": "Yearning Aura",
+  "JIANGXIAOMOD-YEARNING_HALO_POWER.title": "Yearning Halo",
   "JIANGXIAOMOD-YEARNING_HALO_POWER.description": "Every attack has [gold]X%[/gold] Lifesteal.",
   "JIANGXIAOMOD-YEARNING_HALO_POWER.smartDescription": "Every attack has [gold]{M}%[/gold] Lifesteal.",
 
   "JIANGXIAOMOD-RESENTMENT_POWER.title": "Resentment",
-  "JIANGXIAOMOD-RESENTMENT_POWER.description": "When attacked, there is a [gold]X%[/gold] chance to give the attacker a random debuff.",
-  "JIANGXIAOMOD-RESENTMENT_POWER.smartDescription": "When attacked, there is a [gold]{M:diff()}%[/gold] chance to give the attacker a random debuff.",
+  "JIANGXIAOMOD-RESENTMENT_POWER.description": "When attacked, has an [gold]X%[/gold] chance to apply a random debuff to the attacker.",
+  "JIANGXIAOMOD-RESENTMENT_POWER.smartDescription": "When attacked, has an [gold]{M:diff()}%[/gold] chance to apply a random debuff to the attacker.",
 
   "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.title": "Tears of Sorrow",
-  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.description": "At the start of this unit's turn, lose [gold]5%[/gold] Max HP.",
-  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.smartDescription": "At the start of this unit's turn, lose [gold]5%[/gold] Max HP."
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.description": "At the start of this unit's turn, it loses [gold]5%[/gold] Max HP for each stack.",
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.smartDescription": "At the start of this unit's turn, it loses [gold]5%[/gold] Max HP for each stack.",
+
+  "JIANGXIAOMOD-BEI_DOU_NINE_STARS_POWER.title": "Star Chart: Big Dipper",
+  "JIANGXIAOMOD-BEI_DOU_NINE_STARS_POWER.description": "Gain 1 stack for every card played. At [red]9 stacks[/red]:\nGain [gold]X[/gold] Energy and draw [gold]X[/gold] cards.",
+  "JIANGXIAOMOD-BEI_DOU_NINE_STARS_POWER.smartDescription": "Gain 1 stack for every card played. At [red]9 stacks[/red]:\nGain [gold]{M}[/gold] Energy and draw [gold]{N}[/gold] cards.",
+
+  "JIANGXIAOMOD-FLOWER_BLADE_POWER.title": "Star Chart: Flower Blade",
+  "JIANGXIAOMOD-FLOWER_BLADE_POWER.description": "",
+  "JIANGXIAOMOD-FLOWER_BLADE_POWER.smartDescription": "",
+
+  "JIANGXIAOMOD-WITHER_BOW_POWER.title": "Star Chart: Wither Bow",
+  "JIANGXIAOMOD-WITHER_BOW_POWER.description": "",
+  "JIANGXIAOMOD-WITHER_BOW_POWER.smartDescription": "",
+
+  "JIANGXIAOMOD-SOUL_OF_DEVOURING_SEA_POWER.title": "Star Chart: Soul of Devouring Sea",
+  "JIANGXIAOMOD-SOUL_OF_DEVOURING_SEA_POWER.description": "",
+  "JIANGXIAOMOD-SOUL_OF_DEVOURING_SEA_POWER.smartDescription": "",
+
+  "JIANGXIAOMOD-STAR_MARTIAL_RECORDS_POWER.title": "Star Chart: Star Martial Records",
+  "JIANGXIAOMOD-STAR_MARTIAL_RECORDS_POWER.description": "",
+  "JIANGXIAOMOD-STAR_MARTIAL_RECORDS_POWER.smartDescription": "",
+
+  "JIANGXIAOMOD-INK_FLOWER_POWER.title": "Star Chart: Ink Flower",
+  "JIANGXIAOMOD-INK_FLOWER_POWER.description": "",
+  "JIANGXIAOMOD-INK_FLOWER_POWER.smartDescription": "",
+
+  "JIANGXIAOMOD-HOLY_CROSS_POWER.title": "Star Chart: Holy Cross",
+  "JIANGXIAOMOD-HOLY_CROSS_POWER.description": "",
+  "JIANGXIAOMOD-HOLY_CROSS_POWER.smartDescription": "",
+
+  "JIANGXIAOMOD-PEAK_OF_LIFE_POWER.title": "Star Chart: Peak of Life",
+  "JIANGXIAOMOD-PEAK_OF_LIFE_POWER.description": "",
+  "JIANGXIAOMOD-PEAK_OF_LIFE_POWER.smartDescription": "",
+
+  "JIANGXIAOMOD-EARTH_STAR_MAP_POWER.title": "Star Chart: Earth Star Map",
+  "JIANGXIAOMOD-EARTH_STAR_MAP_POWER.description": "",
+  "JIANGXIAOMOD-EARTH_STAR_MAP_POWER.smartDescription": ""
 }

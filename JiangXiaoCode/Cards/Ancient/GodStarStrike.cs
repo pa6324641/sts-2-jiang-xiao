@@ -37,7 +37,7 @@ public class GodStarStrike : JiangXiaoCardModel
         JJPowerTip<StrengthPower>();
         
         // 設定本卡的關鍵字與提示
-        JJKeywordAndTip(JiangXiaoModKeywords.Star);
+        // JJKeywordAndTip(JiangXiaoModKeywords.Star);
     }
 
     protected override void ApplyRankLogic(Player? player, int skillRank)

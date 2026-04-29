@@ -25,5 +25,34 @@
 
   "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.title": "傷淚",
   "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.description": "在該單位回合開始時，每層使其損失 [gold]5%[/gold] 最大生命值。",
-  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.smartDescription": "在該單位回合開始時，每層使其損失 [gold]5%[/gold] 最大生命值。"
+  "JIANGXIAOMOD-TEAR_OF_SORROW_POWER.smartDescription": "在該單位回合開始時，每層使其損失 [gold]5%[/gold] 最大生命值。",
+
+  "JIANGXIAOMOD-BEI_DOU_NINE_STARS_POWER.title": "星圖:北斗九星",
+  "JIANGXIAOMOD-BEI_DOU_NINE_STARS_POWER.description": "每打一張牌+1層數，[red]9層數[/red]後。\n獲得[gold]X[/gold]能量、抽[gold]X[/gold]張牌",
+  "JIANGXIAOMOD-BEI_DOU_NINE_STARS_POWER.smartDescription": "每打一張牌+1層數，[red]9層數[/red]後。\n獲得[gold]{M}[/gold]能量、抽[gold]{N}[/gold]張牌",
+  "JIANGXIAOMOD-FLOWER_BLADE_POWER.title": "星圖:FlowerBladePower",
+  "JIANGXIAOMOD-FLOWER_BLADE_POWER.description": "",
+  "JIANGXIAOMOD-FLOWER_BLADE_POWER.smartDescription": "",
+  "JIANGXIAOMOD-WITHER_BOW_POWER.title": "星圖:WitherBowPower",
+  "JIANGXIAOMOD-WITHER_BOW_POWER.description": "",
+  "JIANGXIAOMOD-WITHER_BOW_POWER.smartDescription": "",
+  "JIANGXIAOMOD-SOUL_OF_DEVOURING_SEA_POWER.title": "星圖:SoulOfDevouringSeaPower",
+  "JIANGXIAOMOD-SOUL_OF_DEVOURING_SEA_POWER.description": "",
+  "JIANGXIAOMOD-SOUL_OF_DEVOURING_SEA_POWER.smartDescription": "",
+  "JIANGXIAOMOD-STAR_MARTIAL_RECORDS_POWER.title": "星圖:StarMartialRecordsPower",
+  "JIANGXIAOMOD-STAR_MARTIAL_RECORDS_POWER.description": "",
+  "JIANGXIAOMOD-STAR_MARTIAL_RECORDS_POWER.smartDescription": "",
+  "JIANGXIAOMOD-INK_FLOWER_POWER.title": "星圖:InkFlowerPower",
+  "JIANGXIAOMOD-INK_FLOWER_POWER.description": "",
+  "JIANGXIAOMOD-INK_FLOWER_POWER.smartDescription": "",
+  "JIANGXIAOMOD-HOLY_CROSS_POWER.title": "星圖:HolyCrossPower",
+  "JIANGXIAOMOD-HOLY_CROSS_POWER.description": "",
+  "JIANGXIAOMOD-HOLY_CROSS_POWER.smartDescription": "",
+  "JIANGXIAOMOD-PEAK_OF_LIFE_POWER.title": "星圖:PeakOfLifePower",
+  "JIANGXIAOMOD-PEAK_OF_LIFE_POWER.description": "",
+  "JIANGXIAOMOD-PEAK_OF_LIFE_POWER.smartDescription": "",
+  "JIANGXIAOMOD-EARTH_STAR_MAP_POWER.title": "星圖:EarthStarMapPower",
+  "JIANGXIAOMOD-EARTH_STAR_MAP_POWER.description": "",
+  "JIANGXIAOMOD-EARTH_STAR_MAP_POWER.smartDescription": ""
+
 }

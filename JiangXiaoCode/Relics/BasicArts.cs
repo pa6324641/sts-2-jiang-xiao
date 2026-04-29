@@ -132,4 +132,5 @@ public sealed class BasicArts : CustomRelicModel
     {
         throw new NotImplementedException();
     }
+
 }

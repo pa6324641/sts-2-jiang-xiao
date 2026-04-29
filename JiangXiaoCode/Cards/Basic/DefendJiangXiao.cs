@@ -26,7 +26,7 @@ public sealed class DefendJiangXiao : JiangXiaoCardModel
 {
     private const decimal BaseBlock = 5m;
     private const decimal UpgradeBlock = 3m;
-    private const decimal RankBonus = 3m;
+    private const decimal RankBonus = 2m;
 
     public DefendJiangXiao() : base(1, CardType.Skill, CardRarity.Basic, TargetType.Self)
     {

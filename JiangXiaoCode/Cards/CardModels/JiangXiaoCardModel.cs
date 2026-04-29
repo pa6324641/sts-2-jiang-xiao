@@ -9,11 +9,20 @@ using MegaCrit.Sts2.Core.HoverTips;
 using System.Collections.Generic;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Combat;
+using JiangXiaoMod.Code.Keywords;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Random;
 
 namespace JiangXiaoMod.Code.Cards.CardModels;
 
 public abstract class JiangXiaoCardModel : CustomCardModel
 {
+    // [核心安全機制] 靜態鎖：防止 EXArt 觸發連鎖效應（例如格鬥刀打出另一張格鬥刀）導致死循環
+    private static bool _isExecutingEXArt = false;
     public override string PortraitPath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".CardImagePath();
     private readonly List<DynamicVar> _customVars = new();
     private readonly List<IHoverTip> _customTips = new();
@@ -104,6 +113,139 @@ public abstract class JiangXiaoCardModel : CustomCardModel
     {
         UpdateStatsBasedOnRank();
         return base.BeforeCombatStart();
+    }
+
+    /// <summary>
+    /// STS2 鉤子：在第一回合抽牌前攔截，處理「被動星技」自動打出邏輯
+    /// </summary>
+    public override async Task BeforeHandDrawLate(Player player, PlayerChoiceContext choiceContext, CombatState combatState)
+    {
+        // 修正判斷：既然 AddKeyword 是對 _keywords 操作，我們就直接檢查 _keywords
+        // 或者為了保險起見，同時檢查自定義集合與基礎集合
+        bool isPassive = _customKeywords.Contains(JiangXiaoModKeywords.Passive) || 
+                        (this.Keywords != null && this.Keywords.Contains(JiangXiaoModKeywords.Passive));
+
+        if (isPassive && 
+            player?.PlayerCombatState != null && 
+            combatState.RoundNumber == 1)
+        {
+            // 檢查當前卡牌是否在抽牌堆 (確保這張卡是從牌堆發動)
+            if (player.PlayerCombatState.DrawPile.Cards.Contains(this))
+            {
+                // 更新數值（確保傷害/格擋與目前星技等級對齊）
+                UpdateStatsBasedOnRank();
+
+                // 執行自動打出指令
+                await CardCmd.AutoPlay(choiceContext, this, player.Creature);
+            }
+        }
+
+        // 呼叫基類實作
+        if(player == null) return;
+        await base.BeforeHandDrawLate(player, choiceContext, combatState);
+    }
+
+/// <summary>
+    /// [STS2_JiangXiao] 基礎技藝額外獎勵 (EXArt)
+    /// </summary>
+    protected async Task EXArt(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        // [遞迴保護]：如果正在執行連鎖，則不重複進入
+        if (_isExecutingEXArt) return;
+
+        var player = Owner;
+        if (player?.PlayerCombatState == null) return;
+
+        var runState = RunManager.Instance.DebugOnlyGetState();
+        if (runState?.Rng?.CombatTargets == null) return;
+        var rng = runState.Rng.CombatTargets;
+
+        _isExecutingEXArt = true; // 開啟鎖定
+
+        try 
+        {
+            // 1. 徒手格鬥: 抽 1 張技能牌
+            if (this.IsJiangXiaoModUNARMED() && JiangXiaoUtils.GetUnarmedRank(player) >= 4 && cardPlay.Card == this)
+            {
+                var skills = player.PlayerCombatState.DrawPile.Cards.Where(c => c.Type == CardType.Skill).ToList();
+                if (skills.Any()) await CardPileCmd.Add(skills[rng.NextInt(skills.Count)], PileType.Hand);
+            }
+
+            // 2. 弓箭精通: 恢復 1 能量
+            if (this.IsJiangXiaoModBOW() && JiangXiaoUtils.GetBowRank(player) >= 4 && cardPlay.Card == this)
+            {
+                await PlayerCmd.GainEnergy(1m, player);
+            }
+
+            // 3. 夏家刀法: 棄牌堆抽 1 張刀法牌
+            if (this.IsJiangXiaoModBLADE() && JiangXiaoUtils.GetBladeRank(player) >= 4 && cardPlay.Card == this)
+            {
+                var bladeCards = player.PlayerCombatState.DiscardPile.Cards.Where(c => c.IsJiangXiaoModBLADE()).ToList();
+                if (bladeCards.Any()) await CardPileCmd.Add(bladeCards[rng.NextInt(bladeCards.Count)], PileType.Hand);
+            }
+
+            // 4. 天方戟: 全體濺射 25% 傷害
+            if (this.IsJiangXiaoModHALBERD() && JiangXiaoUtils.GetHalberdRank(player) >= 4 && cardPlay.Card == this)
+            {
+                decimal currentDmg = this.DynamicVars.Damage.EnchantedValue; 
+                decimal splashDmg = Math.Max(1, (int)(currentDmg * 0.25m));
+                var enemies = this.CombatState?.Enemies.ToList();
+                if (enemies != null)
+                {
+                    foreach (var enemy in enemies) await CreatureCmd.Damage(choiceContext, enemy, splashDmg, ValueProp.Move, null, null);
+                }
+            }
+
+            // 5. [核心修改] 格鬥刀: 從「消耗堆」隨機打出，上限次數 = Rank
+            if (this.IsJiangXiaoModCOMBATKNIFE() && JiangXiaoUtils.GetCombatKnifeRank(player) >= 4 && cardPlay.Card == this)
+            {
+                int knifeRank = JiangXiaoUtils.GetCombatKnifeRank(player);
+                for (int i = 0; i < knifeRank-3 ; i++)
+                {
+                    // 每次循環都重新獲取消耗堆，確保準確性
+                    var validExhaustCards = player.PlayerCombatState.ExhaustPile.Cards
+                        .Where(c => c != this && (c.Type == CardType.Attack || c.Type == CardType.Skill))
+                        .ToList();
+
+                    if (validExhaustCards.Count == 0) break;
+
+                    var targetCard = validExhaustCards[rng.NextInt(validExhaustCards.Count)];
+                    // AutoPlay 內部會自動處理目標選取，但傳入 ResolveTargetFor(targetCard) 更精確
+                    await CardCmd.AutoPlay(choiceContext, targetCard, ResolveTargetFor(targetCard, rng));
+                }
+            }
+
+            // 6. 匕首: 25% 機率獲取 X 能量並複製
+            if (this.IsJiangXiaoModDAGGER() && JiangXiaoUtils.GetDaggerRank(player) >= 4 && cardPlay.Card == this)
+            {
+                if (rng.NextFloat() <= 0.25f) 
+                {
+                    decimal energyToGain = DynamicVars.TryGetValue("X", out var xVar) && xVar.BaseValue != 0 ? xVar.BaseValue : 2m;
+                    CardModel dupeCard = cardPlay.Card.CreateClone();
+                    CardCmd.ApplyKeyword(dupeCard, CardKeyword.Exhaust);
+                    await PlayerCmd.GainEnergy(energyToGain, player);
+                    await CardCmd.AutoPlay(choiceContext, dupeCard, ResolveTargetFor(dupeCard, rng));
+                }
+            }
+        }
+        finally 
+        {
+            _isExecutingEXArt = false; // 解除鎖定
+        }
+    }
+
+    // 輔助函式：優化隨機目標獲取
+    protected Creature? ResolveTargetFor(CardModel card, Rng rng)
+    {
+        if (card.TargetType != TargetType.AnyEnemy || CombatState == null) return null;
+        var enemies = CombatState.HittableEnemies.ToList();
+        return enemies.Count == 0 ? null : enemies[rng.NextInt(enemies.Count)];
+    }
+
+    public override async Task AfterCardPlayedLate(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        await base.AfterCardPlayedLate(choiceContext, cardPlay);
+        await EXArt(choiceContext, cardPlay);
     }
 
 }

@@ -25,7 +25,7 @@ public class StarPowerArrow : JiangXiaoCardModel
     // 數值平衡常數 (放在類別頂部方便調整)
     private const decimal DefaultBase = 3m;    // 未升級基礎
     private const decimal UpgradedBase = 6m;   // 升級後基礎
-    private const decimal BowGrowth = 3m;      // 每級弓箭成長
+    private const decimal BowGrowth = 2m;      // 每級弓箭成長
 
     public StarPowerArrow() : base(4, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy)
     {
@@ -38,7 +38,7 @@ public class StarPowerArrow : JiangXiaoCardModel
 
     /// <summary>
     /// 核心邏輯：將所有動態加成直接算進原生 {Damage} 中
-    /// 公式：(基礎[3或6] + 弓Rank * 3) * 星力等級
+    /// 公式：(基礎[3或6] + 弓Rank * 2) * 星力等級
     /// </summary>
     protected override void ApplyRankLogic(Player? player, int skillRank)
     {

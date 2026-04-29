@@ -15,7 +15,6 @@ using MegaCrit.Sts2.Core.Entities.Relics;
 using BaseLib.Extensions;
 using JiangXiaoMod.Code.Extensions;
 using MegaCrit.Sts2.Core.Map;
-using System.Drawing;
 
 namespace JiangXiaoMod.Code.Relics;
 
@@ -23,14 +22,12 @@ namespace JiangXiaoMod.Code.Relics;
 public sealed class StarSkillQuality : CustomRelicModel
 {
     public override RelicRarity Rarity => RelicRarity.Starter;
-    // protected override string IconBaseName => "star_skill_quality";
 
-    // 這裡定義的 Rank 順序與你的點數判定邏輯一致
     public enum QualityRank { Bronze = 1, Silver = 2, Gold = 3, Platinum = 4, Diamond = 5, CandleMoon = 6, ScorchingSun = 7 }
 
     private const string VarRank = "rank"; 
-    private const string VarMult = "multiplier";
 
+    // 用於強制刷新 UI 文字的反射字段
     private static readonly FieldInfo? DynamicVarsField = typeof(RelicModel).GetField("_dynamicVars", BindingFlags.NonPublic | BindingFlags.Instance);
 
     public int SkillRank => (int)GetRank();
@@ -40,38 +37,30 @@ public sealed class StarSkillQuality : CustomRelicModel
     protected override string PackedIconOutlinePath => $"{Id.Entry.RemovePrefix().ToLowerInvariant()}_outline.png".RelicImagePath();
 
     /// <summary>
-    /// 安全地獲取技能點數 (相容圖鑑、讀檔預覽、多人模式)
+    /// 獲取技能點數
+    /// 修正：在 STS2 中，直接使用 Owner 屬性是區分多人模式不同玩家的最穩定方式。
     /// </summary>
     public int GetPoints()
     {
-        // 優先從運行狀態獲取，若無則嘗試從當前 Owner 獲取（這能覆蓋大多數情況）
-        var runState = RunManager.Instance?.DebugOnlyGetState();
-        var player = runState?.Players.FirstOrDefault() ?? Owner;
-        
-        if (player == null) return 0;
-
-        // 從目標玩家的遺物中尋找核心遺物 InnerStarMap
-        // 原本需要寫 if (null) 的邏輯現在簡化為：
-        var mainRelic = JiangXiaoUtils.GetStarMap(player);
-
-        if (mainRelic != null)
+        // 1. 檢查遺物是否有持有者 (Owner)
+        // 在戰鬥或地圖移動時，持有此遺物的玩家會被正確賦值給 Owner。
+        // 這能確保在多人模式下，每個玩家的遺物都只檢查自己的點數。
+        if (Owner != null)
         {
-            // 直接訪問介面定義的屬性，不管是基礎版還是升級版都通用
-            int points = mainRelic.JiangXiaoMod_SkillPoints;
-            return points;
+            // 使用你的工具類獲取該玩家身上的星圖遺物
+            var mainRelic = JiangXiaoUtils.GetStarMap(Owner);
+            return mainRelic?.JiangXiaoMod_SkillPoints ?? 0;
         }
-        else
-        {
-            return 0;
-        }
+
+        // 2. 如果 Owner 為空，通常發生在圖鑑 (Compendium) 或商店預覽。
+        // 此時回傳 0 以避免空引用崩潰。
+        return 0;
     }
-    
 
     public QualityRank GetRank()
     {
         int points = GetPoints();
         
-        // 依照你設定的階級閾值
         if (points < 5000) return QualityRank.Bronze;
         if (points < 10000) return QualityRank.Silver;
         if (points < 20000) return QualityRank.Gold;
@@ -81,35 +70,18 @@ public sealed class StarSkillQuality : CustomRelicModel
         return QualityRank.ScorchingSun;
     }
 
-    // public float GetValueMultiplier()
-    // {
-    //     // 公式：1.0, 1.5, 2.0... 每階提升 50%
-    //     return 1.0f + (SkillRank - 1) * 0.5f;
-    // }
-
     protected override IEnumerable<DynamicVar> CanonicalVars
     {
         get
         {
-            int currentRank = SkillRank;
-            // 傳遞 Rank 給 choose 格式化器，傳遞 Multiplier * 100 給描述顯示百分比
-            yield return new DynamicVar(VarRank, (decimal)currentRank);
-            // yield return new DynamicVar(VarMult, (decimal)(GetValueMultiplier() * 100));
+            // STS2 會調用此處來獲取數值並渲染到描述文本中
+            yield return new DynamicVar(VarRank, (decimal)SkillRank);
         }
     }
 
-    /// <summary>
-    /// 供卡牌或其他系統靜態調用的倍率接口
-    /// </summary>
-    // public static float GetCurrentMultiplier(IRunState? runState)
-    // {
-    //     var player = runState?.Players.FirstOrDefault();
-    //     var relic = player?.Relics.OfType<StarSkillQuality>().FirstOrDefault();
-    //     return relic?.GetValueMultiplier() ?? 1.0f;
-    // }
-
     public override Task BeforeCombatStart()
     {
+        // 戰鬥開始前刷新一次顯示，確保等級是最新的
         RefreshDisplay();
         return Task.CompletedTask;
     }
@@ -117,14 +89,25 @@ public sealed class StarSkillQuality : CustomRelicModel
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
+        // 獲得遺物時刷新顯示
         RefreshDisplay();
     }
 
     public override bool ShouldReceiveCombatHooks => true;
 
+    /// <summary>
+    /// 強制清除動態變量緩存，促使遊戲重新讀取 CanonicalVars 並更新 UI 文本。
+    /// </summary>
     public void RefreshDisplay()
     {
-        // 清除快取以強制刷新敘述中的 {rank} 與 {multiplier}
-        DynamicVarsField?.SetValue(this, null);
+        try 
+        {
+            // 清空緩存後，下一次 UI 渲染就會重新觸發 CanonicalVars 的 get 訪問器
+            DynamicVarsField?.SetValue(this, null);
+        }
+        catch (Exception)
+        {
+            // 靜默處理反射異常
+        }
     }
 }

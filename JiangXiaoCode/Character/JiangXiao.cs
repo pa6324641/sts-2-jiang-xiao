@@ -20,6 +20,7 @@ using JiangXiaoMod.Code.Extensions;
 using MegaCrit.Sts2.Core.Nodes.Combat;
 using BaseLib.Patches.UI;
 using MegaCrit.Sts2.addons.mega_text;
+using JiangXiaoMod.Code.Cards.Ancient;
 
 
 namespace JiangXiaoMod.Code.Character;
@@ -101,7 +102,7 @@ public class JiangXiao : CustomCharacterModel
 	public override string CustomAttackSfx => "";
 	public override string CustomCastSfx => "";
 	public override string CustomDeathSfx => "";
-	public override string CharacterSelectSfx => "";
+	public override string CharacterSelectSfx => "res://JiangXiao/sound/JiangXiao_select.mp3";
 	public override List<string> GetArchitectAttackVfx() =>
 	[
 		"vfx/vfx_attack_blunt",

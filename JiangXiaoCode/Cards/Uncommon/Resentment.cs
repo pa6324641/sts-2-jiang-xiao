@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Players;
 using JiangXiaoMod.Code.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using JiangXiaoMod.Code.Keywords;
 
 namespace JiangXiaoMod.Code.Cards.Rare;
 
@@ -65,5 +66,6 @@ public class Resentment : JiangXiaoCardModel
     {
         // 升級效果：能量消耗 1 -> 0
         EnergyCost.UpgradeBy(-1);
+        AddKeyword(JiangXiaoModKeywords.Passive);
     }
 }

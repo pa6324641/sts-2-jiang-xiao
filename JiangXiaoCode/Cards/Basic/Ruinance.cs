@@ -78,17 +78,17 @@ public sealed class Ruinance : JiangXiaoCardModel
     /// <summary>
     /// 被動星技邏輯：第一回合若在抽牌堆則自動打出
     /// </summary>
-    public override async Task BeforeHandDrawLate(Player player, PlayerChoiceContext choiceContext, CombatState combatState)
-    {
-        if (player?.PlayerCombatState != null && 
-            player.PlayerCombatState.DrawPile.Cards.Contains(this) && 
-            combatState.RoundNumber == 1)
-        {
-            // 自動播放前確保數值已根據當前星技品質更新
-            UpdateStatsBasedOnRank();
-            await CardCmd.AutoPlay(choiceContext, this, player.Creature);
-        }
-    }
+    // public override async Task BeforeHandDrawLate(Player player, PlayerChoiceContext choiceContext, CombatState combatState)
+    // {
+    //     if (player?.PlayerCombatState != null && 
+    //         player.PlayerCombatState.DrawPile.Cards.Contains(this) && 
+    //         combatState.RoundNumber == 1)
+    //     {
+    //         // 自動播放前確保數值已根據當前星技品質更新
+    //         UpdateStatsBasedOnRank();
+    //         await CardCmd.AutoPlay(choiceContext, this, player.Creature);
+    //     }
+    // }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {

@@ -36,6 +36,8 @@ public sealed class XiaBladeStyle2 : JiangXiaoCardModel
 
         // [STS2_Optimization] 使用基類輔助方法添加關鍵字，確保提示視窗 (HoverTip) 自動生成
         JJKeywordAndTip(JiangXiaoModKeywords.JiangXiaoModBLADE);
+
+        JJTag(CardTag.Strike);
     }
 
     /// <summary>
@@ -73,6 +75,8 @@ public sealed class XiaBladeStyle2 : JiangXiaoCardModel
             .Targeting(cardPlay.Target)
             .WithHitFx("vfx/vfx_attack_slash") 
             .Execute(choiceContext);
+
+        // await EXArt(choiceContext);
     }
 
     /// <summary>
@@ -81,7 +85,7 @@ public sealed class XiaBladeStyle2 : JiangXiaoCardModel
     protected override void OnUpgrade()
     {
         // 費用 2 -> 0 (根據您的代碼 UpgradeBy(-2))
-        EnergyCost.UpgradeBy(-2);
+        EnergyCost.UpgradeBy(-1);
 
         // 刷新數值：這會觸發 ApplyRankLogic，並根據 IsUpgraded 切換基礎值
         UpdateStatsBasedOnRank();

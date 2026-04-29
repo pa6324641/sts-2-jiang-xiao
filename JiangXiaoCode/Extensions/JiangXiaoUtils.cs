@@ -47,6 +47,15 @@ public static class JiangXiaoUtils
         return relic?.SkillRank ?? 1;
     }
 
+
+    public static int GetPowerLevel(Player? player)
+    {
+        if (player == null) return 1;
+        var relic = player.Relics.OfType<StarPowerLevel>().FirstOrDefault();
+        return relic?.PowerLevel ?? 1;
+    }
+
+
     /// <summary>
     /// 獲取基礎技藝遺物實例
     /// </summary>
@@ -57,12 +66,17 @@ public static class JiangXiaoUtils
     }
 
     // --- 技藝等級獲取 ---
-
+	//徒手格鬥
     public static int GetUnarmedRank(Player? player) => GetArtRank(player, BasicArtType.Unarmed);
+	//夏家刀法
     public static int GetBladeRank(Player? player)   => GetArtRank(player, BasicArtType.Blade);
+	//弓箭
     public static int GetBowRank(Player? player)     => GetArtRank(player, BasicArtType.Bow);
+	//匕首
     public static int GetDaggerRank(Player? player)  => GetArtRank(player, BasicArtType.Dagger);
+	//天方戟
     public static int GetHalberdRank(Player? player) => GetArtRank(player, BasicArtType.Halberd);
+	//格鬥刀
     public static int GetCombatKnifeRank(Player? player) => GetArtRank(player, BasicArtType.Knife);
 
     /// <summary>

@@ -27,12 +27,15 @@ public sealed class QingMang : JiangXiaoCardModel
 {
     public const string CardId = "JIANGXIAOMOD-QING_MANG";
     private const string MVarKey = "M";
+    private const string DamagX = "X";
+
 
     public QingMang() : base(1, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy)
     {
         // 初始化基礎數值
         JJDamage(6m, ValueProp.Move);
         JJCustomVar(MVarKey, 3m);
+        JJCustomVar(DamagX, 3m);
         
         // 添加關鍵字與提示
         JJKeywordAndTip(JiangXiaoModKeywords.Star);
@@ -46,7 +49,7 @@ public sealed class QingMang : JiangXiaoCardModel
     protected override void ApplyRankLogic(Player? player, int skillRank)
     {
         // 1. 定義成長係數
-        decimal stepDmg = 3m;
+        decimal stepDmg = 2m;
         decimal stepM = 3m;
 
         decimal baseDmg = IsUpgraded ? 9m : 6m;
@@ -86,7 +89,7 @@ public sealed class QingMang : JiangXiaoCardModel
         // 確保 cardSource == this，避免其他來源的計算意外觸發此邏輯
         if (target != null && cardSource == this && target.Powers.Any(p => p is ArtifactPower))
         {
-            finalAmount *= 5m;
+            finalAmount *= DynamicVars[DamagX].BaseValue;
         }
 
         return finalAmount;

@@ -37,6 +37,8 @@ public sealed class XiaBladeStyle3 : JiangXiaoCardModel
         JJKeywordAndTip(JiangXiaoModKeywords.JiangXiaoModBLADE);
         JJDamage(BaseVal, ValueProp.Move);
         JJBlock(BaseVal, ValueProp.Move);
+
+        JJTag(CardTag.Strike);
     }
 
     /// <summary>
@@ -72,12 +74,12 @@ public sealed class XiaBladeStyle3 : JiangXiaoCardModel
             .Targeting(cardPlay.Target)
             .WithHitFx("vfx/vfx_attack_slash") 
             .Execute(choiceContext);
+        
+        // await EXArt(choiceContext);
     }
 
     protected override void OnUpgrade()
     {
-        // 基礎傷害與格擋由 3 -> 8，且依然享受等級成長。
-        EnergyCost.UpgradeBy(-3); 
-        // 數值更新會在 ApplyRankLogic 中根據 IsUpgraded 自動處理
+        EnergyCost.UpgradeBy(-1); 
     }
 }

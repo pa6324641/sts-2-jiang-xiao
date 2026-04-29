@@ -19,7 +19,7 @@ namespace JiangXiaoMod.Code.Powers;
 /// </summary>
 public sealed class BeatBackPower : JiangXiaoPowerModel
 {
-    // 定義常量以便在地化文本中通過 [!Amount!] 引用
+    // 定義常量以便在地化文本中通過 {var} 引用
     public const string VarAmount = "var";
 
     public override PowerType Type => PowerType.Debuff;

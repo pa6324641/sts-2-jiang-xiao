@@ -27,7 +27,7 @@ public class ShadowOfVoid : JiangXiaoCardModel
 {
     public const string CardId = "ShadowOfVoid";
 
-    public ShadowOfVoid() : base(3, CardType.Skill, CardRarity.Rare, TargetType.None)
+    public ShadowOfVoid() : base(4, CardType.Skill, CardRarity.Rare, TargetType.None)
     {
         JJCustomVar("M", 1m); 
         JJKeywordAndTip(JiangXiaoModKeywords.Star);
@@ -115,7 +115,7 @@ public class ShadowOfVoid : JiangXiaoCardModel
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-3);
+        EnergyCost.UpgradeBy(-1);
         UpdateStatsBasedOnRank();
     }
 }

@@ -29,6 +29,8 @@ public class XiaBladeStyle1 : JiangXiaoCardModel
         JJKeywordAndTip(JiangXiaoModKeywords.JiangXiaoModBLADE);
         JJDamage(1m, ValueProp.Move);
         JJBlock(1m, ValueProp.Move);
+
+        JJTag(CardTag.Strike);
     }
     /// <summary>
     /// 核心邏輯：根據「刀法等級 (BladeRank)」與「是否升級」計算數值
@@ -65,14 +67,14 @@ public class XiaBladeStyle1 : JiangXiaoCardModel
             .Targeting(cardPlay.Target)
             .WithHitFx("vfx/vfx_attack_slash")
             .Execute(choiceContext);
+
+        // await EXArt(choiceContext);
     }
 
     protected override void OnUpgrade()
     {
         // 升級時減少費用
         EnergyCost.UpgradeBy(-1);
-        
-        // 觸發數值刷新，這會調用 ApplyRankLogic，並透過 IsUpgraded 判斷增加基礎值
         UpdateStatsBasedOnRank();
     }
 }

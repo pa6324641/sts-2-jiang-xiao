@@ -18,6 +18,9 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.Rooms;
 using BaseLib.Extensions;
 using JiangXiaoMod.Code.Extensions;
+using JiangXiaoMod.Code.Powers.StarMaps;
+using MegaCrit.Sts2.Core.Commands;
+using Godot;
 
 namespace JiangXiaoMod.Code.Relics;
 
@@ -82,11 +85,11 @@ public sealed class InnerStarMapPlus : CustomRelicModel, IInnerStarMap
 
     public override Task AfterCombatVictory(CombatRoom room)
     {
-        int gain = 2500;
+        int gain = 1250;
         if (room != null)
         {
-            if (room.RoomType == RoomType.Boss) gain = 10000;
-            else if (room.RoomType == RoomType.Elite) gain = 5000;
+            if (room.RoomType == RoomType.Boss) gain = 5000;
+            else if (room.RoomType == RoomType.Elite) gain = 2500;
         }
 
         if (Owner?.Creature?.CombatState != null)
@@ -96,6 +99,16 @@ public sealed class InnerStarMapPlus : CustomRelicModel, IInnerStarMap
 
         JiangXiaoMod_SkillPoints += gain;
         Flash(); 
+        return Task.CompletedTask;
+    }
+    public override Task BeforeRoomEntered(AbstractRoom room)
+    {
+        int gain = 1250;
+        if (room.RoomType == RoomType.Event || room.RoomType == RoomType.Shop || room.RoomType == RoomType.RestSite || room.RoomType == RoomType.Treasure)
+        {
+            JiangXiaoMod_SkillPoints += gain;
+            Flash(); 
+        }
         return Task.CompletedTask;
     }
 
@@ -108,5 +121,26 @@ public sealed class InnerStarMapPlus : CustomRelicModel, IInnerStarMap
     }
 
     public override RelicModel? GetUpgradeReplacement() => null;
+
+    // [新增]：偵測北斗九星能力的施加
+    public override async Task BeforeCombatStart()
+    {
+        // 1. 檢查持有者是否已經擁有該能力（避免重複施加）
+        // STS2 BaseLib 中，使用 HasPower<T>() 擴展方法
+        if (!Owner.HasPower<BeiDouNineStarsPower>())
+        {
+            // 符合條件，在控制台輸出調試資訊
+            GD.Print("江曉成功啟動了北斗九星！");
+            
+            // 2. 施加能力：目標為 Owner 的 Creature，層數為 1
+            // [STS2_API] 使用 PowerCmd.Apply 異步執行
+            await PowerCmd.Apply<BeiDouNineStarsPower>(Owner.Creature, 1, null, null);
+            
+            // 3. 觸發遺物閃爍視覺效果
+            Flash();
+        }
+
+        await base.BeforeCombatStart();
+    }
     
 }
