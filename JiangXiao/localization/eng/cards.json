@@ -153,5 +153,26 @@
     "JIANGXIAOMOD-SILENCE_OF_VOID.description": "[gold]Star Technique[/gold].\nSeal all enemy [gold]Positive Effects[/gold] into [blue]Voice of Silence[/blue] for {T} turns. Returns effects when finished.\nQuality Bonus: {DPercent}% Max HP damage and Stun.",
 
     "JIANGXIAOMOD-DOMAIN_OF_TEARS.title": "Domain of Tears",
-    "JIANGXIAOMOD-DOMAIN_OF_TEARS.description": "Gain [gold]Domain of Tears[/gold].\nCurrently plays {M} cards."
+    "JIANGXIAOMOD-DOMAIN_OF_TEARS.description": "Gain [gold]Domain of Tears[/gold].\nCurrently plays {M} cards.",
+
+    "JIANGXIAOMOD-EARTH_LIGHT.title": "Earth Light",
+    "JIANGXIAOMOD-EARTH_LIGHT.description": "Choose a [blue]Star Map[/blue] to replace your current one.",
+    "JIANGXIAOMOD-BEI_DOU_NINE_STARS_TOKEN.title": "Star Map: Big Dipper Nine Stars",
+    "JIANGXIAOMOD-BEI_DOU_NINE_STARS_TOKEN.description": "Remove your current [blue]Star Map[/blue].\nGain [blue]Big Dipper Nine Stars[/blue] capability.",
+    "JIANGXIAOMOD-FLOWER_BLADE_TOKEN.title": "Star Map: Flower Blade",
+    "JIANGXIAOMOD-FLOWER_BLADE_TOKEN.description": "Remove your current [blue]Star Map[/blue].\nGain [blue]Flower Blade[/blue] capability.",
+    "JIANGXIAOMOD-WITHER_BOW_TOKEN.title": "Star Map: Wither Bow",
+    "JIANGXIAOMOD-WITHER_BOW_TOKEN.description": "Remove your current [blue]Star Map[/blue].\nGain [blue]Wither Bow[/blue] capability.",
+    "JIANGXIAOMOD-SOUL_OF_DEVOURING_SEA_TOKEN.title": "Star Map: Soul of Devouring Sea",
+    "JIANGXIAOMOD-SOUL_OF_DEVOURING_SEA_TOKEN.description": "Remove your current [blue]Star Map[/blue].\nGain [blue]Soul of Devouring Sea[/blue] capability.",
+    "JIANGXIAOMOD-STAR_MARTIAL_RECORDS_TOKEN.title": "Star Map: Star Martial Records",
+    "JIANGXIAOMOD-STAR_MARTIAL_RECORDS_TOKEN.description": "Remove your current [blue]Star Map[/blue].\nGain [blue]Star Martial Records[/blue] capability.",
+    "JIANGXIAOMOD-INK_FLOWER_TOKEN.title": "Star Map: Ink Flower",
+    "JIANGXIAOMOD-INK_FLOWER_TOKEN.description": "Remove your current [blue]Star Map[/blue].\nGain [blue]Ink Flower[/blue] capability.",
+    "JIANGXIAOMOD-HOLY_CROSS_TOKEN.title": "Star Map: Holy Cross",
+    "JIANGXIAOMOD-HOLY_CROSS_TOKEN.description": "Remove your current [blue]Star Map[/blue].\nGain [blue]Holy Cross[/blue] capability.",
+    "JIANGXIAOMOD-PEAK_OF_LIFE_TOKEN.title": "Star Map: Peak of Life",
+    "JIANGXIAOMOD-PEAK_OF_LIFE_TOKEN.description": "Remove your current [blue]Star Map[/blue].\nGain [blue]Peak of Life[/blue] capability.",
+    "JIANGXIAOMOD-EARTH_STAR_MAP_TOKEN.title": "Star Map: Earth",
+    "JIANGXIAOMOD-EARTH_STAR_MAP_TOKEN.description": "Remove your current [blue]Star Map[/blue].\nGain [blue]Earth[/blue] capability."
 }

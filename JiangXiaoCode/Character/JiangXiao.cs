@@ -70,9 +70,9 @@ public class JiangXiao : CustomCharacterModel
 	// 初始遺物
 	public override IReadOnlyList<RelicModel> StartingRelics => [
 		ModelDb.Relic<InnerStarMap>(),
-		ModelDb.Relic<StarPowerLevel>() ,
-		ModelDb.Relic<StarSkillQuality>(),
-		ModelDb.Relic<BasicArts>() 
+		// ModelDb.Relic<StarPowerLevel>() ,
+		// ModelDb.Relic<StarSkillQuality>(),
+		// ModelDb.Relic<BasicArts>() 
 	];
 
 	// 正確的池指定方式：確保這些池類 (JiangXiaoCardPool 等) 已經正確定義

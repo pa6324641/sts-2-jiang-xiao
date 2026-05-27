@@ -69,48 +69,6 @@ public sealed class Blessing : JiangXiaoCardModel
         return base.BeforeCombatStart();
     }
 
-    // protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
-    // {
-    //     if (CombatState == null || Owner == null) return;
-
-    //     // 1. 確保最新數值並獲取當前治療量
-    //     UpdateStatsBasedOnRank();
-    //     decimal currentHeal = DynamicVars[VarHeal].BaseValue;
-    //     int rank = JiangXiaoUtils.GetSkillRank(Owner);
-
-    //     // 2. 準備選項清單
-    //     var choices = new List<CardModel>
-    //     {
-    //         CreateAndSetupToken<BlessingAllyToken>(currentHeal),
-    //         CreateAndSetupToken<BlessingEnemyToken>(currentHeal),
-    //         CreateAndSetupToken<BlessingSelfToken>(currentHeal)
-    //     };
-
-    //     // 星技品質 5 級 (星空期) 解鎖群體治療
-    //     if (rank >= 5)
-    //     {
-    //         choices.Add(CreateAndSetupToken<BlessingAllAllyToken>(currentHeal));
-    //         choices.Add(CreateAndSetupToken<BlessingAllEnemyToken>(currentHeal));
-    //     }
-
-    //     // 3. 彈出二選一/多選一畫面
-    //     var selectedCard = await CardSelectCmd.FromChooseACardScreen(
-    //         choiceContext,
-    //         choices,
-    //         Owner
-    //     );
-
-    //     // 4. 將選中的卡片加入手牌
-    //     if (selectedCard != null)
-    //     {
-    //         await CardPileCmd.AddGeneratedCardToCombat(
-    //             selectedCard,
-    //             PileType.Hand,
-    //             false, // 是否本回合 0 費 (Token 本身通常設定為 0 費，故傳入 false)
-    //             CardPilePosition.Top 
-    //         );
-    //     }
-    // }
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         if (CombatState == null || Owner == null) return;

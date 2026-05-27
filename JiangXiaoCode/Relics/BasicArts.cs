@@ -28,9 +28,7 @@ namespace JiangXiaoMod.Code.Relics;
 [Pool(typeof(JiangXiaoRelicPool))]
 public sealed class BasicArts : CustomRelicModel
 {
-    public override RelicRarity Rarity => RelicRarity.Starter;
-    // protected override string IconBaseName => "basic_arts";
-
+    public override RelicRarity Rarity => RelicRarity.Common;
     // --- 存檔字段定義 (使用簡化 Setter) ---
 
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]

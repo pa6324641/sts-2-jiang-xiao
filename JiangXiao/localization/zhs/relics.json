@@ -12,7 +12,7 @@
   "JIANGXIAOMOD-STAR_POWER_LEVEL.flavor": "星力如潮汐般湧動，每一顆星辰的點亮都意味著質的飛躍。",
 
   "JIANGXIAOMOD-STAR_SKILL_QUALITY.title": "星技品質",
-  "JIANGXIAOMOD-STAR_SKILL_QUALITY.description": "當前品質：[gold]{rank:choose(1|2|3|4|5|6|7):青銅|白銀|黃金|白金|鑽石|燭月|焦陽}[/gold] 。",
+  "JIANGXIAOMOD-STAR_SKILL_QUALITY.description": "當前品質：[gold]{rank:choose(1|2|3|4|5|6|7):青銅|白銀|黃金|白金|鑽石|燭月|焦陽}[/gold]。\n牌組包含 [gold]時空之隙[/gold] 時，解鎖地圖飛行，最大距離為 [gold]{rank}[/gold] 層。",
   "JIANGXIAOMOD-STAR_SKILL_QUALITY.flavor": "品質決定了星力的純度，從青銅到焦陽，是凡人與神祇的鴻溝。",
 
   "JIANGXIAOMOD-BASIC_ARTS.title": "基礎技藝",

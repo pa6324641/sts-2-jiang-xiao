@@ -8,3 +8,5 @@ public class JiangXiaoRelicPool : CustomRelicPoolModel
 	public override string EnergyColorName => JiangXiao.CharacterId;
 	public override Color LabOutlineColor => JiangXiao.Color;
 }
+
+

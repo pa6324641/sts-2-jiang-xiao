@@ -22,7 +22,7 @@ namespace JiangXiaoMod.Code.Relics;
 [Pool(typeof(JiangXiaoRelicPool))]
 public sealed class StarPowerLevel : CustomRelicModel
 {
-    public override RelicRarity Rarity => RelicRarity.Starter;
+    public override RelicRarity Rarity => RelicRarity.Common;
     private const string VarLevel = "level";
     private const string VarEnergy = "energy";
     public int PowerLevel => GetLevel();

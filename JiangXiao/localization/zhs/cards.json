@@ -154,5 +154,26 @@
 	"JIANGXIAOMOD-SILENCE_OF_VOID.description": "[gold]星技[/gold]。\n封存敵方全體的 [gold]正面效果[/gold] 進 [blue]沉默之聲[/blue] 能力中。\n持續 {T} 回合。能力結束時返還效果。\n星技品質額外效果：{DPercent}% 最大生命傷害、暈眩。",
 
 	"JIANGXIAOMOD-DOMAIN_OF_TEARS.title": "域淚",
- 	"JIANGXIAOMOD-DOMAIN_OF_TEARS.description": "獲得 [gold]域淚[/gold] 能力。\n目前將打出 {M} 張牌。"
+ 	"JIANGXIAOMOD-DOMAIN_OF_TEARS.description": "獲得 [gold]域淚[/gold] 能力。\n目前將打出 {M} 張牌。",
+
+	"JIANGXIAOMOD-EARTH_LIGHT.title": "地光",
+	"JIANGXIAOMOD-EARTH_LIGHT.description": "選取要更換的[blue]星圖[/blue]。",
+	"JIANGXIAOMOD-BEI_DOU_NINE_STARS_TOKEN.title": "星圖:北斗九星",
+	"JIANGXIAOMOD-BEI_DOU_NINE_STARS_TOKEN.description": "移除當前[blue]星圖[/blue]。\n獲得 [blue]北斗九星[/blue] 能力。",
+	"JIANGXIAOMOD-FLOWER_BLADE_TOKEN.title": "星圖:花刃",
+	"JIANGXIAOMOD-FLOWER_BLADE_TOKEN.description": "移除當前[blue]星圖[/blue]。\n獲得 [blue]花刃[/blue] 能力。",
+	"JIANGXIAOMOD-WITHER_BOW_TOKEN.title": "星圖:凋零弓",
+	"JIANGXIAOMOD-WITHER_BOW_TOKEN.description": "移除當前[blue]星圖[/blue]。\n獲得 [blue]凋零弓[/blue] 能力。",
+	"JIANGXIAOMOD-SOUL_OF_DEVOURING_SEA_TOKEN.title": "星圖:噬海之魂",
+	"JIANGXIAOMOD-SOUL_OF_DEVOURING_SEA_TOKEN.description": "移除當前[blue]星圖[/blue]。\n獲得 [blue]噬海之魂[/blue] 能力。",
+	"JIANGXIAOMOD-STAR_MARTIAL_RECORDS_TOKEN.title": "星圖:星武紀",
+	"JIANGXIAOMOD-STAR_MARTIAL_RECORDS_TOKEN.description": "移除當前[blue]星圖[/blue]。\n獲得 [blue]星武紀[/blue] 能力。",
+	"JIANGXIAOMOD-INK_FLOWER_TOKEN.title": "星圖:油墨花",
+	"JIANGXIAOMOD-INK_FLOWER_TOKEN.description": "移除當前[blue]星圖[/blue]。\n獲得 [blue]油墨花[/blue] 能力。",
+	"JIANGXIAOMOD-HOLY_CROSS_TOKEN.title": "星圖:聖十字架",
+	"JIANGXIAOMOD-HOLY_CROSS_TOKEN.description": "移除當前[blue]星圖[/blue]。\n獲得 [blue]聖十字架[/blue] 能力。",
+	"JIANGXIAOMOD-PEAK_OF_LIFE_TOKEN.title": "星圖:生命巔峰",
+	"JIANGXIAOMOD-PEAK_OF_LIFE_TOKEN.description": "移除當前[blue]星圖[/blue]。\n獲得 [blue]生命巔峰[/blue] 能力。",
+	"JIANGXIAOMOD-EARTH_STAR_MAP_TOKEN.title": "星圖:大地",
+	"JIANGXIAOMOD-EARTH_STAR_MAP_TOKEN.description": "移除當前[blue]星圖[/blue]。\n獲得 [blue]大地[/blue] 能力。"
 }

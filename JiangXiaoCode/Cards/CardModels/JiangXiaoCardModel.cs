@@ -286,4 +286,9 @@ public abstract class JiangXiaoCardModel : CustomCardModel
         await EXArt(choiceContext, cardPlay);
     }
 
+    protected override void OnUpgrade()
+    {
+        UpdateStatsBasedOnRank();
+    }
+
 }

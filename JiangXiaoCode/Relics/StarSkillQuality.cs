@@ -15,17 +15,21 @@ using MegaCrit.Sts2.Core.Entities.Relics;
 using BaseLib.Extensions;
 using JiangXiaoMod.Code.Extensions;
 using MegaCrit.Sts2.Core.Map;
+using MegaCrit.Sts2.Core.Rooms;
 
 namespace JiangXiaoMod.Code.Relics;
 
 [Pool(typeof(JiangXiaoRelicPool))]
 public sealed class StarSkillQuality : CustomRelicModel
 {
-    public override RelicRarity Rarity => RelicRarity.Starter;
+    public override RelicRarity Rarity => RelicRarity.Common;
 
     public enum QualityRank { Bronze = 1, Silver = 2, Gold = 3, Platinum = 4, Diamond = 5, CandleMoon = 6, ScorchingSun = 7 }
 
     private const string VarRank = "rank"; 
+    
+    // 定義觸發特殊效果的卡牌 ID
+    private const string SpaceGaptId = "JIANGXIAOMOD-SPACE_GAP"; 
 
     // 用於強制刷新 UI 文字的反射字段
     private static readonly FieldInfo? DynamicVarsField = typeof(RelicModel).GetField("_dynamicVars", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -38,23 +42,32 @@ public sealed class StarSkillQuality : CustomRelicModel
 
     /// <summary>
     /// 獲取技能點數
-    /// 修正：在 STS2 中，直接使用 Owner 屬性是區分多人模式不同玩家的最穩定方式。
     /// </summary>
     public int GetPoints()
     {
-        // 1. 檢查遺物是否有持有者 (Owner)
-        // 在戰鬥或地圖移動時，持有此遺物的玩家會被正確賦值給 Owner。
-        // 這能確保在多人模式下，每個玩家的遺物都只檢查自己的點數。
-        if (Owner != null)
+        // 💡【圖鑑防崩潰核心修復】
+        // 在 STS2 中，如果遺物處於圖鑑原型 (Canonical) 狀態，直接調用 Owner 會觸發 AssertMutable 崩潰。
+        // 我們透過 base.IsCanonical 或者是直接判斷 Owner 欄位是否為空來進行防呆。
+        
+        // 如果您的基底類別有支援 IsCanonical 屬性，可以直接用：
+        // if (base.IsCanonical || Owner == null) return 0;
+
+        // 如果不確定是否有 IsCanonical，用最安全的 try-catch 配合 null 檢查攔截：
+        try
         {
-            // 使用你的工具類獲取該玩家身上的星圖遺物
+            if (Owner == null)
+            {
+                return 0; // 圖鑑或商店預覽時，沒有持有者，直接回傳 0 點（顯示青銅）
+            }
+
             var mainRelic = JiangXiaoUtils.GetStarMap(Owner);
             return mainRelic?.JiangXiaoMod_SkillPoints ?? 0;
         }
-
-        // 2. 如果 Owner 為空，通常發生在圖鑑 (Compendium) 或商店預覽。
-        // 此時回傳 0 以避免空引用崩潰。
-        return 0;
+        catch (MegaCrit.Sts2.Core.Models.Exceptions.CanonicalModelException)
+        {
+            // 如果不幸在 Owner 讀取時就踩到原生的 Assert 崩潰，直接在這裡捕獲並安全回傳 0
+            return 0;
+        }
     }
 
     public QualityRank GetRank()
@@ -74,14 +87,33 @@ public sealed class StarSkillQuality : CustomRelicModel
     {
         get
         {
-            // STS2 會調用此處來獲取數值並渲染到描述文本中
             yield return new DynamicVar(VarRank, (decimal)SkillRank);
         }
     }
 
+    // ==========================================
+    // 地圖自由移動（飛行）
+    // ==========================================
+    public override bool ShouldAllowFreeTravel()
+    {
+        if (Owner?.Deck?.Cards == null) return false;
+        
+        // 只要有卡片，就允許原生飛行（作為基礎權限放行）
+        return Owner.Deck.Cards.Any(c => c.Id.Entry == SpaceGaptId);
+    }
+
+    /// <summary>
+    /// 進入新房間時刷新 UI。
+    /// 這能確保玩家在戰鬥中獲得/移除該卡牌，或是星技點數變動時，遺物文字能保持最新。
+    /// </summary>
+    public override Task AfterRoomEntered(AbstractRoom room)
+    {
+        RefreshDisplay();
+        return Task.CompletedTask;
+    }
+
     public override Task BeforeCombatStart()
     {
-        // 戰鬥開始前刷新一次顯示，確保等級是最新的
         RefreshDisplay();
         return Task.CompletedTask;
     }
@@ -89,7 +121,6 @@ public sealed class StarSkillQuality : CustomRelicModel
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        // 獲得遺物時刷新顯示
         RefreshDisplay();
     }
 
@@ -102,7 +133,6 @@ public sealed class StarSkillQuality : CustomRelicModel
     {
         try 
         {
-            // 清空緩存後，下一次 UI 渲染就會重新觸發 CanonicalVars 的 get 訪問器
             DynamicVarsField?.SetValue(this, null);
         }
         catch (Exception)
